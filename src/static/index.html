@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AS4242420425 — JoyfulReaper on DN42</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0c0f12;
+      --panel: #12171c;
+      --panel-2: #0f1418;
+      --text: #d8dee4;
+      --muted: #8d98a5;
+      --line: #26313a;
+      --accent: #72d572;
+      --link: #80c8ff;
+      --warn: #ffcf66;
+      --error: #ff8b8b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 2.5rem 1rem 5rem;
+      background: var(--bg);
+      color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+                   "Liberation Mono", "Courier New", monospace;
+      line-height: 1.55;
+    }
+    h1, h2, h3 { color: #fff; }
+    h1 { margin-bottom: .25rem; }
+    h2 {
+      margin-top: 2.4rem;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: .35rem;
+    }
+    a { color: var(--link); }
+    code { color: #a8efa8; }
+    .muted { color: var(--muted); }
+    .warning { color: var(--warn); }
+    .lede { margin-top: 0; color: var(--muted); }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: .8rem;
+      margin: 1.2rem 0;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 1rem;
+      border-radius: 5px;
+    }
+    .card h3 { margin: 0 0 .7rem; font-size: 1rem; }
+    dl {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      gap: .25rem 1rem;
+      margin: 0;
+    }
+    dt { color: var(--muted); }
+    dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--panel);
+    }
+    th, td {
+      text-align: left;
+      padding: .6rem .65rem;
+      border: 1px solid var(--line);
+      vertical-align: top;
+    }
+    th { color: #fff; background: var(--panel-2); }
+    .status-up { color: var(--accent); }
+    form {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 1rem;
+      border-radius: 5px;
+    }
+    label { display: block; margin: .85rem 0 .25rem; color: #fff; }
+    input, textarea {
+      width: 100%;
+      padding: .6rem;
+      border: 1px solid #384650;
+      border-radius: 3px;
+      background: #090c0f;
+      color: var(--text);
+      font: inherit;
+    }
+    textarea { min-height: 8rem; resize: vertical; }
+    button {
+      margin-top: 1rem;
+      padding: .65rem 1rem;
+      border: 1px solid #5da65d;
+      background: #173017;
+      color: #dff7df;
+      font: inherit;
+      cursor: pointer;
+    }
+    button:hover { background: #204020; }
+    .notice {
+      padding: .8rem 1rem;
+      margin: 1rem 0;
+      border: 1px solid #477747;
+      background: #102410;
+    }
+    .error {
+      padding: .8rem 1rem;
+      margin: 1rem 0;
+      border: 1px solid #8f4848;
+      background: #2a1111;
+      color: var(--error);
+    }
+    .honeypot {
+      position: absolute !important;
+      left: -10000px !important;
+      width: 1px !important;
+      height: 1px !important;
+      overflow: hidden !important;
+    }
+    footer {
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: .92rem;
+    }
+    @media (max-width: 640px) {
+      body { padding-top: 1.25rem; }
+      dl { grid-template-columns: 1fr; gap: 0; }
+      dt { margin-top: .45rem; }
+      table { font-size: .88rem; }
+      th, td { padding: .45rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AS4242420425</h1>
+    <p class="lede">JoyfulReaper / kgivler on DN42 — New York, US</p>
+  </header>
+
+  <div class="grid">
+    <section class="card">
+      <h3>Network</h3>
+      <dl>
+        <dt>ASN</dt><dd><code>AS4242420425</code></dd>
+        <dt>IPv4</dt><dd><code>172.20.220.48/28</code></dd>
+        <dt>IPv6</dt><dd><code>fdf0:e12c:5528::/48</code></dd>
+        <dt>Router</dt><dd>Clanker</dd>
+        <dt>Routing</dt><dd>BIRD 2</dd>
+      </dl>
+    </section>
+
+    <section class="card">
+      <h3>Landing service</h3>
+      <dl>
+        <dt>IPv4</dt><dd><code>172.20.220.50</code></dd>
+        <dt>IPv6</dt><dd><code>fdf0:e12c:5528::10</code></dd>
+        <dt>DNS</dt><dd><code>kgivler.dn42</code> planned</dd>
+        <dt>HTTPS</dt><dd>DN42 CA investigation planned</dd>
+      </dl>
+    </section>
+
+    <section class="card">
+      <h3>Routing policy</h3>
+      <dl>
+        <dt>Peering</dt><dd>Open, manual approval</dd>
+        <dt>Transport</dt><dd>WireGuard</dd>
+        <dt>BGP</dt><dd>MP-BGP / IPv6 link-local</dd>
+        <dt>Validation</dt><dd>DN42 ROA validation</dd>
+        <dt>Transit</dt><dd>Not currently provided</dd>
+      </dl>
+    </section>
+  </div>
+
+  <h2>About</h2>
+  <p>
+    This is my little corner of DN42: routing experiments, weird services,
+    old protocols, and whatever else seems interesting enough to put on the
+    fake Internet.
+  </p>
+  <p>
+    <strong>AS4242420425 currently operates as a stub network.</strong>
+    I accept DN42 routes from peers and currently export only my own registered
+    prefixes. Providing DN42 transit is in scope for future experimentation,
+    but peers should not currently depend on this network for transit.
+  </p>
+  <p class="muted">This is a hobby network. There is no SLA and no uptime guarantee.</p>
+
+  <h2>Current peers</h2>
+  <table>
+    <thead>
+      <tr><th>Network</th><th>ASN</th><th>Location</th><th>State</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>RoutedBits</td><td><code>AS4242420207</code></td><td>Newark, NJ</td><td class="status-up">Established</td></tr>
+      <tr><td>Baragoon</td><td><code>AS4242421732</code></td><td>New York, NY</td><td class="status-up">Established</td></tr>
+      <tr><td>HEADSCARF175</td><td><code>AS4242420842</code></td><td>Piscataway, NJ</td><td class="status-up">Established</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Services</h2>
+  <ul>
+    <li><strong>DN42Landing</strong> — <code>172.20.220.50</code> / <code>fdf0:e12c:5528::10</code></li>
+    <li><strong>Random Steam Game Picker</strong> — planned for DN42, with <code>randomsteam.dn42</code> planned as a dedicated DN42 domain.</li>
+    <li>More services will appear as I get around to breaking them.</li>
+  </ul>
+
+  <h2>Peering policy</h2>
+  <p>
+    Manual peering requests are open. WireGuard is the preferred tunnel
+    transport. MP-BGP over IPv6 link-local with Extended Next Hop is preferred
+    where supported.
+  </p>
+  <p>
+    Please have valid DN42 registry objects and ROAs. Low-latency North American
+    peers are especially welcome, but they are not a hard requirement.
+  </p>
+  <p>
+    I generate a <strong>fresh WireGuard keypair per approved peer</strong>.
+    There is intentionally no single public WireGuard key shown here. After I
+    approve a request, I create the peer-specific interface and return my public
+    key, UDP port, and link-local details.
+  </p>
+
+  <h3>What to send</h3>
+  <ul>
+    <li>your ASN and network name</li>
+    <li>a contact method</li>
+    <li>your public WireGuard endpoint</li>
+    <li>your WireGuard public key</li>
+    <li>your preferred IPv6 link-local addressing, if any</li>
+    <li>anything unusual I should know about the session</li>
+  </ul>
+
+  <p class="warning">
+    Submitting this form does not automatically configure anything. Requests are
+    reviewed manually. No automatic WireGuard, firewall, BIRD, or route changes
+    are made.
+  </p>
+
+  <h2>Request peering</h2>
+
+  {{if .Submitted}}
+    <div class="notice">Request received. It has been queued for manual review.</div>
+  {{end}}
+
+  {{if .Error}}
+    <div class="error">{{.Error}}</div>
+  {{end}}
+
+  <form method="post" action="/peering/request">
+    <label for="asn">ASN</label>
+    <input id="asn" name="asn" required placeholder="AS4242421234" value="{{.Form.ASN}}">
+
+    <label for="network_name">Network name</label>
+    <input id="network_name" name="network_name" required placeholder="Example Network" value="{{.Form.NetworkName}}">
+
+    <label for="contact">Contact</label>
+    <input id="contact" name="contact" required placeholder="email, Matrix, IRC, etc." value="{{.Form.Contact}}">
+
+    <label for="endpoint">WireGuard endpoint</label>
+    <input id="endpoint" name="endpoint" required placeholder="peer.example.net:12345" value="{{.Form.Endpoint}}">
+
+    <label for="wireguard_public_key">WireGuard public key</label>
+    <input id="wireguard_public_key" name="wireguard_public_key" required
+           placeholder="base64 WireGuard public key"
+           value="{{.Form.WireGuardPublicKey}}">
+
+    <label for="link_local_preference">IPv6 link-local preference</label>
+    <input id="link_local_preference" name="link_local_preference"
+           placeholder="e.g. you fe80::1234, me fe80::425"
+           value="{{.Form.LinkLocalPreference}}">
+
+    <label for="notes">Notes</label>
+    <textarea id="notes" name="notes"
+              placeholder="BGP capabilities, preferred direction, location, weirdness, etc.">{{.Form.Notes}}</textarea>
+
+    <div class="honeypot" aria-hidden="true">
+      <label for="website">Website</label>
+      <input id="website" name="website" tabindex="-1" autocomplete="off">
+    </div>
+
+    <button type="submit">Submit peering request</button>
+  </form>
+
+  <h2>Operator notes</h2>
+  <p class="muted">
+    Basic request metadata is stored locally for peering administration.
+    Peering submissions are stored in SQLite and may trigger a private ntfy
+    notification. There are no third-party analytics or advertising services.
+  </p>
+
+  <footer>AS4242420425 · DN42 · probably overengineered for a hobby network</footer>
+</body>
+</html>
