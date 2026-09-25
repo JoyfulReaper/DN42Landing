@@ -59,7 +59,7 @@ A requester submits:
 Submission:
 
 1. validates basic fields
-2. is rate-limited by source address
+2. is globally rate-limited to one valid submission every 15 minutes
 3. is stored in SQLite
 4. optionally fires an ntfy notification
 5. does **not** modify WireGuard, BIRD, firewall rules, or routing
@@ -102,7 +102,7 @@ Environment variables:
 | `DN42LANDING_DB` | `/var/lib/dn42landing/peering.db` |
 | `DN42LANDING_NTFY_URL` | `http://127.0.0.1:5197/dn42-peering` |
 | `DN42LANDING_NTFY_TOKEN` | empty |
-| `DN42LANDING_RATE_LIMIT` | `60s` |
+| `DN42LANDING_RATE_LIMIT` | `15m` |
 
 If `DN42LANDING_NTFY_URL` is empty, ntfy is disabled.
 

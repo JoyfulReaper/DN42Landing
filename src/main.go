@@ -40,7 +40,7 @@ type app struct {
 	ntfyURL     string
 	ntfyToken   string
 	httpClient  *http.Client
-	rateLimiter *ipRateLimiter
+	rateLimiter *globalRateLimiter
 }
 
 type pageData struct {
@@ -61,10 +61,10 @@ type peeringRequest struct {
 	UserAgent           string
 }
 
-type ipRateLimiter struct {
+type globalRateLimiter struct {
 	mu       sync.Mutex
 	interval time.Duration
-	lastSeen map[string]time.Time
+	lastSeen time.Time
 }
 
 func main() {
@@ -93,7 +93,7 @@ func main() {
 		log.Fatalf("parse page template: %v", err)
 	}
 
-	rateLimit, err := time.ParseDuration(envOrDefault("DN42LANDING_RATE_LIMIT", "60s"))
+	rateLimit, err := time.ParseDuration(envOrDefault("DN42LANDING_RATE_LIMIT", "15m"))
 	if err != nil {
 		log.Fatalf("invalid DN42LANDING_RATE_LIMIT: %v", err)
 	}
@@ -106,9 +106,8 @@ func main() {
 		httpClient: &http.Client{
 			Timeout: 3 * time.Second,
 		},
-		rateLimiter: &ipRateLimiter{
+		rateLimiter: &globalRateLimiter{
 			interval: rateLimit,
-			lastSeen: make(map[string]time.Time),
 		},
 	}
 
@@ -204,13 +203,6 @@ func (a *app) handleIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *app) handlePeeringRequest(w http.ResponseWriter, r *http.Request) {
-	remote := remoteHost(r.RemoteAddr)
-
-	if !a.rateLimiter.allow(remote) {
-		http.Error(w, "Too many requests. Please wait a minute and try again.", http.StatusTooManyRequests)
-		return
-	}
-
 	r.Body = http.MaxBytesReader(w, r.Body, 16*1024)
 
 	if err := r.ParseForm(); err != nil {
@@ -223,6 +215,8 @@ func (a *app) handlePeeringRequest(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/?submitted=1", http.StatusSeeOther)
 		return
 	}
+
+	remote := remoteHost(r.RemoteAddr)
 
 	req := peeringRequest{
 		ASN:                 clean(r.FormValue("asn"), 16),
@@ -241,6 +235,15 @@ func (a *app) handlePeeringRequest(w http.ResponseWriter, r *http.Request) {
 			Error: err.Error(),
 			Form:  req,
 		})
+		return
+	}
+
+	if !a.rateLimiter.allow() {
+		http.Error(
+			w,
+			"For my sanity, peering requests are globally limited to one submission every 15 minutes. If someone beat you to it, wait a bit and try again.",
+			http.StatusTooManyRequests,
+		)
 		return
 	}
 
@@ -365,22 +368,16 @@ func (a *app) publishNtfy(parent context.Context, body string) error {
 	return nil
 }
 
-func (l *ipRateLimiter) allow(ip string) bool {
+func (l *globalRateLimiter) allow() bool {
 	now := time.Now()
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
-	for key, seen := range l.lastSeen {
-		if now.Sub(seen) > 10*l.interval {
-			delete(l.lastSeen, key)
-		}
-	}
-
-	if seen, ok := l.lastSeen[ip]; ok && now.Sub(seen) < l.interval {
+	if !l.lastSeen.IsZero() && now.Sub(l.lastSeen) < l.interval {
 		return false
 	}
 
-	l.lastSeen[ip] = now
+	l.lastSeen = now
 	return true
 }
 
