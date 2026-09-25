@@ -1,0 +1,161 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DB="${DN42LANDING_DB:-/var/lib/dn42landing/peering.db}"
+
+die()
+{
+    echo "Error: $*" >&2
+    exit 1
+}
+
+require_database()
+{
+    command -v sqlite3 >/dev/null 2>&1 ||
+        die "sqlite3 is not installed."
+
+    [[ -f "$DB" ]] ||
+        die "Database not found: $DB"
+
+    [[ -r "$DB" ]] ||
+        die "Cannot read $DB. Try running with sudo."
+}
+
+valid_id()
+{
+    [[ "${1:-}" =~ ^[0-9]+$ ]]
+}
+
+entry_exists()
+{
+    local id="$1"
+
+    [[ "$(sqlite3 "$DB" \
+        "SELECT EXISTS(SELECT 1 FROM peering_requests WHERE id = $id);")" == "1" ]]
+}
+
+list_entries()
+{
+    echo
+    sqlite3 \
+        -header \
+        -column \
+        "$DB" <<'SQL'
+SELECT
+    id,
+    submitted_utc,
+    asn,
+    network_name,
+    contact,
+    status
+FROM peering_requests
+ORDER BY id DESC;
+SQL
+    echo
+}
+
+show_entry()
+{
+    local id="${1:-}"
+
+    if [[ -z "$id" ]]; then
+        read -rp "Entry ID: " id
+    fi
+
+    valid_id "$id" || {
+        echo "Invalid ID."
+        return
+    }
+
+    if ! entry_exists "$id"; then
+        echo "Entry $id does not exist."
+        return
+    fi
+
+    echo
+    sqlite3 \
+        -header \
+        -line \
+        "$DB" \
+        "SELECT * FROM peering_requests WHERE id = $id;"
+    echo
+}
+
+delete_entry()
+{
+    local id
+
+    read -rp "Entry ID to delete: " id
+
+    valid_id "$id" || {
+        echo "Invalid ID."
+        return
+    }
+
+    if ! entry_exists "$id"; then
+        echo "Entry $id does not exist."
+        return
+    fi
+
+    show_entry "$id"
+
+    echo "This permanently deletes entry $id."
+    read -rp "Type DELETE to continue: " confirmation
+
+    if [[ "$confirmation" != "DELETE" ]]; then
+        echo "Cancelled."
+        return
+    fi
+
+    local changed
+
+    changed="$(
+        sqlite3 "$DB" "
+            DELETE FROM peering_requests WHERE id = $id;
+            SELECT changes();
+        "
+    )"
+
+    if [[ "$changed" == "1" ]]; then
+        echo "Deleted entry $id."
+    else
+        echo "Nothing deleted."
+    fi
+}
+
+main_menu()
+{
+    while true; do
+        echo
+        echo "DN42 Peering Request Admin"
+        echo "=========================="
+        echo "1) Show entries"
+        echo "2) Show full entry"
+        echo "3) Delete entry"
+        echo "4) Quit"
+        echo
+
+        read -rp "Choice: " choice
+
+        case "$choice" in
+            1)
+                list_entries
+                ;;
+            2)
+                show_entry
+                ;;
+            3)
+                delete_entry
+                ;;
+            4|q|Q)
+                exit 0
+                ;;
+            *)
+                echo "Unknown choice."
+                ;;
+        esac
+    done
+}
+
+require_database
+main_menu
