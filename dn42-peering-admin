@@ -123,6 +123,71 @@ delete_entry()
     fi
 }
 
+change_status()
+{
+    local id
+    local choice
+    local status
+    local changed
+
+    read -rp "Entry ID: " id
+
+    valid_id "$id" || {
+        echo "Invalid ID."
+        return
+    }
+
+    if ! entry_exists "$id"; then
+        echo "Entry $id does not exist."
+        return
+    fi
+
+    show_entry "$id"
+
+    echo "New status:"
+    echo "1) Pending"
+    echo "2) Approved"
+    echo "3) Configured"
+    echo "4) Rejected"
+    echo
+
+    read -rp "Choice: " choice
+
+    case "$choice" in
+        1)
+            status="Pending"
+            ;;
+        2)
+            status="Approved"
+            ;;
+        3)
+            status="Configured"
+            ;;
+        4)
+            status="Rejected"
+            ;;
+        *)
+            echo "Cancelled."
+            return
+            ;;
+    esac
+
+    changed="$(
+        sqlite3 "$DB" "
+            UPDATE peering_requests
+            SET status = '$status'
+            WHERE id = $id;
+            SELECT changes();
+        "
+    )"
+
+    if [[ "$changed" == "1" ]]; then
+        echo "Entry $id status changed to $status."
+    else
+        echo "Nothing changed."
+    fi
+}
+
 main_menu()
 {
     while true; do
@@ -132,7 +197,8 @@ main_menu()
         echo "1) Show entries"
         echo "2) Show full entry"
         echo "3) Delete entry"
-        echo "4) Quit"
+        echo "4) Change status"
+        echo "5) Quit"
         echo
 
         read -rp "Choice: " choice
@@ -147,7 +213,10 @@ main_menu()
             3)
                 delete_entry
                 ;;
-            4|q|Q)
+            4)
+                change_status
+                ;;
+            5|q|Q)
                 exit 0
                 ;;
             *)
