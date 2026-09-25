@@ -1,7 +1,7 @@
 diff --git a/src/main.go b/src/main.go
 --- a/src/main.go
 +++ b/src/main.go
-@@ -387,6 +387,12 @@ func requestLogging(next http.Handler) http.Handler {
+@@ -388,6 +388,12 @@
  	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
  		start := time.Now()
  		next.ServeHTTP(w, r)
@@ -14,11 +14,23 @@ diff --git a/src/main.go b/src/main.go
  		log.Printf(
  			"%s %s remote=%s ua=%q duration=%s",
  			r.Method,
+diff --git a/example.env b/example.env
+--- a/example.env
++++ b/example.env
+@@ -10,3 +10,8 @@
+ 
+ # DN42LANDING_DB=/var/lib/dn42landing/peering.db
+ # DN42LANDING_RATE_LIMIT=60s
++
++# Optional Mission Control landing-page visit telemetry.
++# If MISSION_CONTROL_API_KEY is empty, telemetry is disabled.
++MISSION_CONTROL_URL=http://127.0.0.1:5190/api/events
++MISSION_CONTROL_API_KEY=
 diff --git a/src/mission_control.go b/src/mission_control.go
 new file mode 100644
 --- /dev/null
 +++ b/src/mission_control.go
-@@ -0,0 +1,145 @@
+@@ -0,0 +1,133 @@
 +package main
 +
 +import (
@@ -141,7 +153,6 @@ new file mode 100644
 +		return "", err
 +	}
 +
-+	// UUID v4 bits.
 +	b[6] = (b[6] & 0x0f) | 0x40
 +	b[8] = (b[8] & 0x3f) | 0x80
 +
@@ -153,15 +164,3 @@ new file mode 100644
 +		s[16:20] + "-" +
 +		s[20:32], nil
 +}
-diff --git a/example.env b/example.env
---- a/example.env
-+++ b/example.env
-@@ -11,3 +11,8 @@ DN42LANDING_NTFY_TOKEN=
-
- # DN42LANDING_DB=/var/lib/dn42landing/peering.db
- # DN42LANDING_RATE_LIMIT=60s
-+
-+# Optional Mission Control landing-page visit telemetry.
-+# If MISSION_CONTROL_API_KEY is empty, telemetry is disabled.
-+MISSION_CONTROL_URL=http://127.0.0.1:5190/api/events
-+MISSION_CONTROL_API_KEY=

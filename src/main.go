@@ -388,6 +388,12 @@ func requestLogging(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		next.ServeHTTP(w, r)
+
+		if r.Method == http.MethodGet && r.URL.Path == "/" {
+			payload := makeMissionControlVisitPayload(r)
+			go publishMissionControlVisit(payload)
+		}
+
 		log.Printf(
 			"%s %s remote=%s ua=%q duration=%s",
 			r.Method,
