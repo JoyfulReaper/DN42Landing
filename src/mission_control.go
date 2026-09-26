@@ -47,7 +47,7 @@ func init() {
 
 func makeMissionControlVisitPayload(r *http.Request) missionControlVisitPayload {
 	return missionControlVisitPayload{
-		Remote:    remoteHost(r.RemoteAddr),
+		Remote:    requestRemoteHost(r),
 		Method:    r.Method,
 		Path:      r.URL.Path,
 		UserAgent: r.UserAgent(),

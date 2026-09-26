@@ -216,7 +216,7 @@ func (a *app) handlePeeringRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	remote := remoteHost(r.RemoteAddr)
+	remote := requestRemoteHost(r)
 
 	req := peeringRequest{
 		ASN:                 clean(r.FormValue("asn"), 16),
@@ -395,7 +395,7 @@ func requestLogging(next http.Handler) http.Handler {
 			"%s %s remote=%s ua=%q duration=%s",
 			r.Method,
 			r.URL.Path,
-			remoteHost(r.RemoteAddr),
+			requestRemoteHost(r),
 			r.UserAgent(),
 			time.Since(start).Round(time.Millisecond),
 		)
@@ -408,6 +408,28 @@ func remoteHost(remoteAddr string) string {
 		return host
 	}
 	return remoteAddr
+}
+
+// requestRemoteHost returns the original client address when a request came
+// through a trusted local reverse proxy.
+//
+// X-Real-IP is ignored unless the immediate TCP peer is loopback, so direct
+// clients cannot spoof their source address by supplying the header themselves.
+func requestRemoteHost(r *http.Request) string {
+	immediate := remoteHost(r.RemoteAddr)
+
+	peerIP := net.ParseIP(immediate)
+	if peerIP == nil || !peerIP.IsLoopback() {
+		return immediate
+	}
+
+	realIP := strings.TrimSpace(r.Header.Get("X-Real-IP"))
+	parsed := net.ParseIP(realIP)
+	if parsed == nil {
+		return immediate
+	}
+
+	return parsed.String()
 }
 
 func clean(value string, max int) string {
