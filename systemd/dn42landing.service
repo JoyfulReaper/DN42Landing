@@ -11,13 +11,10 @@ DynamicUser=true
 StateDirectory=dn42landing
 WorkingDirectory=/var/lib/dn42landing
 
-Environment=DN42LANDING_IPV4_LISTEN=172.20.220.50:80
-Environment=DN42LANDING_IPV6_LISTEN=[fdf0:e12c:5528::10]:80
+Environment=DN42LANDING_IPV4_LISTEN=127.0.0.1:5186
+Environment=DN42LANDING_IPV6_LISTEN=
 Environment=DN42LANDING_DB=/var/lib/dn42landing/peering.db
 EnvironmentFile=-/etc/dn42landing.env
-
-AmbientCapabilities=CAP_NET_BIND_SERVICE
-CapabilityBoundingSet=CAP_NET_BIND_SERVICE
 
 NoNewPrivileges=true
 PrivateTmp=true
