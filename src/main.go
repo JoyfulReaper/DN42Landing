@@ -22,7 +22,7 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-//go:embed static/index.html
+//go:embed static/index.html static/toys.html static/site.css
 var staticFS embed.FS
 
 const (
@@ -37,6 +37,7 @@ var asnPattern = regexp.MustCompile(`(?i)^AS[0-9]{1,10}$`)
 type app struct {
 	db          *sql.DB
 	page        *template.Template
+        toysPage    *template.Template
 	ntfyURL     string
 	ntfyToken   string
 	httpClient  *http.Client
@@ -88,6 +89,16 @@ func main() {
 		log.Fatalf("read embedded page: %v", err)
 	}
 
+	toysBytes, err := staticFS.ReadFile("static/toys.html")
+	if err != nil {
+		log.Fatalf("read embedded toys page: %v", err)
+	}
+
+	toysPage, err := template.New("toys").Parse(string(toysBytes))
+	if err != nil {
+		log.Fatalf("parse toys page template: %v", err)
+	}
+
 	page, err := template.New("index").Parse(string(pageBytes))
 	if err != nil {
 		log.Fatalf("parse page template: %v", err)
@@ -101,6 +112,7 @@ func main() {
 	a := &app{
 		db:        db,
 		page:      page,
+		toysPage: toysPage,
 		ntfyURL:   os.Getenv("DN42LANDING_NTFY_URL"),
 		ntfyToken: os.Getenv("DN42LANDING_NTFY_TOKEN"),
 		httpClient: &http.Client{
@@ -116,7 +128,21 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
+
+	mux.HandleFunc("GET /site.css", func(w http.ResponseWriter, r *http.Request) {
+		css, err := staticFS.ReadFile("static/site.css")
+		if err != nil {
+			http.Error(w, "stylesheet unavailable", http.StatusInternalServerError)
+			return
+	}
+
+	w.Header().Set("Content-Type", "text/css; charset=utf-8")
+	w.Header().Set("Cache-Control", "public, max-age=3600")
+	_, _ = w.Write(css)
+	})
+
 	mux.HandleFunc("GET /", a.handleIndex)
+	mux.HandleFunc("GET /toys", a.handleToys)
 	mux.HandleFunc("POST /peering/request", a.handlePeeringRequest)
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
@@ -298,6 +324,17 @@ func (a *app) handlePeeringRequest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/?submitted=1", http.StatusSeeOther)
+}
+
+func (a *app) handleToys(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+	w.Header().Set("Referrer-Policy", "no-referrer")
+	w.Header().Set("X-Frame-Options", "DENY")
+
+	if err := a.toysPage.Execute(w, nil); err != nil {
+		log.Printf("render toys page: %v", err)
+	}
 }
 
 func (a *app) renderIndex(w http.ResponseWriter, status int, data pageData) {
