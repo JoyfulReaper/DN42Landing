@@ -16,24 +16,52 @@
     other things running on the fake Internet.</p>
     <p><a href="/">← AS4242420425</a></p>
   </header>
-  <div class="grid">
-    <section class="card">
-      <h2>Quote of the Day</h2>
+  <div class="grid toys-grid">
+    <section class="card toy-card">
+      <div class="toy-heading">
+        <h2>Quote of the Day</h2><span class=
+        "toy-service">HAPPYQOTD</span>
+      </div>
       <div id="qotd" class="toy-output">
         <span class="muted">Fetching today's questionable
         wisdom...</span>
       </div>
     </section>
-    <section class="card">
-      <h2>Recent Git Commit</h2>
+    <section class="card toy-card">
+      <div class="toy-heading">
+        <h2>Random Quote</h2><button id="random-quote-refresh"
+        class="toy-button" type="button">New quote</button>
+      </div>
+      <div id="random-quote" class="toy-output">
+        <span class="muted">Selecting wisdom at random...</span>
+      </div>
+    </section>
+    <section class="card toy-card">
+      <div class="toy-heading">
+        <h2>Recent Git Commit</h2><span class="toy-service">MISSION
+        CONTROL</span>
+      </div>
       <div id="recent-git" class="toy-output">
         <span class="muted">Consulting the commit crimes...</span>
       </div>
     </section>
-    <section class="card">
-      <h2>TCPNoise Observatory</h2>
+    <section class="card toy-card">
+      <div class="toy-heading">
+        <h2>Workstation Status</h2><button id="workstation-refresh"
+        class="toy-button" type="button">Refresh</button>
+      </div>
+      <div id="workstation" class="toy-output">
+        <span class="muted">Poking the workstation...</span>
+      </div>
+    </section>
+    <section class="card toy-card toy-wide">
+      <div class="toy-heading">
+        <h2>TCPNoise Observatory</h2><span class=
+        "toy-service">COMING SOON</span>
+      </div>
       <p>See what strange things are poking at the network.</p>
-      <p class="status coming-soon">coming soon</p>
+      <p class="status coming-soon">Sensor feed not yet
+      connected.</p>
     </section>
   </div>
   <footer>

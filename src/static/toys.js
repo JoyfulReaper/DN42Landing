@@ -51,6 +51,62 @@ async function loadQotd() {
   }
 }
 
+async function loadRandomQuote() {
+  const container = document.getElementById("random-quote");
+  const button = document.getElementById("random-quote-refresh");
+
+  if (!container) return;
+
+  if (button) {
+    button.disabled = true;
+  }
+
+  container.replaceChildren(
+    textElement("span", "Selecting wisdom at random...", "muted")
+  );
+
+  try {
+    const response = await fetch("/api/toys/random-quote", {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const quote = await response.json();
+
+    container.replaceChildren(
+      textElement(
+        "div",
+        `"${quote.text || "No quote available."}"`,
+        "toy-quote"
+      ),
+      textElement(
+        "div",
+        `— ${quote.author || "Unknown"}${
+          quote.source ? ` · ${quote.source}` : ""
+        }`,
+        "toy-meta"
+      )
+    );
+  } catch (error) {
+    console.error("Random quote:", error);
+
+    container.replaceChildren(
+      textElement(
+        "span",
+        "Random quote is temporarily unavailable.",
+        "warning"
+      )
+    );
+  } finally {
+    if (button) {
+      button.disabled = false;
+    }
+  }
+}
+
 async function loadRecentGit() {
   const container = document.getElementById("recent-git");
   if (!container) return;
@@ -117,5 +173,97 @@ async function loadRecentGit() {
   }
 }
 
+async function loadWorkstation() {
+  const container = document.getElementById("workstation");
+  const button = document.getElementById("workstation-refresh");
+
+  if (!container) return;
+
+  if (button) {
+    button.disabled = true;
+  }
+
+  container.replaceChildren(
+    textElement("span", "Poking the workstation...", "muted")
+  );
+
+  try {
+    const response = await fetch("/api/toys/workstation", {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const status = await response.json();
+
+    const grid = document.createElement("dl");
+    grid.className = "status-grid";
+
+    const fields = [
+      ["OS", `${status.os || "Unknown"} / ${status.architecture || "?"}`],
+      ["Uptime", status.uptime || "Unknown"],
+      ["CPU", `${status.cpuUsage || "?"} / ${status.cpuCores || "?"} cores`],
+      ["RAM", status.ram || "Unknown"],
+      ["Storage", status.storage || "Unknown"],
+      ["GPU", status.gpu?.name || "Unknown"],
+      [
+        "GPU load",
+        status.gpu?.loadPercentage != null
+          ? `${status.gpu.loadPercentage}%`
+          : "Unknown",
+      ],
+      [
+        "VRAM",
+        status.gpu?.vramUsedMB && status.gpu?.vramTotalMB
+          ? `${status.gpu.vramUsedMB} / ${status.gpu.vramTotalMB} MB`
+          : "Unknown",
+      ],
+      ["Processes", String(status.processCount ?? "Unknown")],
+      ["Runtime", status.framework || "Unknown"],
+    ];
+
+    for (const [label, value] of fields) {
+      grid.append(
+        textElement("dt", label),
+        textElement("dd", value)
+      );
+    }
+
+    container.replaceChildren(grid);
+  } catch (error) {
+    console.error("Workstation status:", error);
+
+    container.replaceChildren(
+      textElement(
+        "span",
+        "Workstation telemetry is temporarily unavailable.",
+        "warning"
+      )
+    );
+  } finally {
+    if (button) {
+      button.disabled = false;
+    }
+  }
+}
+
+document
+  .getElementById("workstation-refresh")
+  ?.addEventListener("click", () => {
+    void loadWorkstation();
+  });
+
+void loadWorkstation();
+
+document
+  .getElementById("random-quote-refresh")
+  ?.addEventListener("click", () => {
+    void loadRandomQuote();
+  });
+
+void loadWorkstation();
+void loadRandomQuote();
 void loadQotd();
 void loadRecentGit();

@@ -263,3 +263,78 @@ footer {
 .toy-commit-message {
   margin-top: 0.45rem;
 }
+
+.toys-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.toy-card {
+  min-width: 0;
+}
+
+.toy-wide {
+  grid-column: 1 / -1;
+}
+
+.toy-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.65rem;
+  margin-bottom: 0.8rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.toy-heading h2 {
+  margin: 0;
+}
+
+.toy-service {
+  color: var(--accent);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.toy-button {
+  margin: 0;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--link);
+  background: transparent;
+  color: var(--link);
+  font-size: 0.78rem;
+}
+
+.toy-button:hover {
+  background: #10212c;
+}
+
+.toy-button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.status-grid {
+  grid-template-columns: max-content 1fr;
+  gap: 0.3rem 1rem;
+}
+
+.status-grid dt {
+  color: var(--muted);
+}
+
+.status-grid dd {
+  color: var(--text);
+}
+
+@media (max-width: 700px) {
+  .toys-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .toy-wide {
+    grid-column: auto;
+  }
+}

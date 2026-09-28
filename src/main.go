@@ -31,8 +31,10 @@ const (
 	defaultDBPath     = "/var/lib/dn42landing/peering.db"
 	defaultNtfyURL    = "http://127.0.0.1:5197/dn42-peering"
 
-	defaultQOTDURL = "https://qotd.kgivler.dn42/api/quotes/today"
-	defaultGitURL  = "https://api.kgivler.dn42/api/github/activity?limit=1"
+	defaultQOTDURL       = "https://qotd.kgivler.dn42/api/quotes/today"
+	defaultRandomQOTDURL = "https://qotd.kgivler.dn42/api/quotes/random"
+	defaultGitURL        = "https://api.kgivler.dn42/api/github/activity?limit=1"
+	defaultStatusURL     = "https://api.kgivler.dn42/api/system/status"
 )
 
 var asnPattern = regexp.MustCompile(`(?i)^AS[0-9]{1,10}$`)
@@ -175,6 +177,25 @@ func main() {
 			envOrDefault("DN42LANDING_GIT_URL", defaultGitURL),
 		)
 	})
+
+	mux.HandleFunc("GET /api/toys/random-quote", func(w http.ResponseWriter, r *http.Request) {
+		proxyJSON(
+			w,
+			r,
+			a.httpClient,
+			envOrDefault("DN42LANDING_RANDOM_QOTD_URL", defaultRandomQOTDURL),
+		)
+	})
+
+	mux.HandleFunc("GET /api/toys/workstation", func(w http.ResponseWriter, r *http.Request) {
+		proxyJSON(
+			w,
+			r,
+			a.httpClient,
+			envOrDefault("DN42LANDING_STATUS_URL", defaultStatusURL),
+		)
+	})
+
 	mux.HandleFunc("POST /peering/request", a.handlePeeringRequest)
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
