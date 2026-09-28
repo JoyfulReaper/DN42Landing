@@ -22,7 +22,7 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-//go:embed static/index.html static/toys.html static/site.css
+//go:embed static/index.html static/toys.html static/site.css static/toys.js
 var staticFS embed.FS
 
 const (
@@ -30,6 +30,9 @@ const (
 	defaultIPv6Listen = "[fdf0:e12c:5528::50]:80"
 	defaultDBPath     = "/var/lib/dn42landing/peering.db"
 	defaultNtfyURL    = "http://127.0.0.1:5197/dn42-peering"
+
+	defaultQOTDURL = "https://qotd.kgivler.dn42/api/quotes/today"
+	defaultGitURL  = "https://api.kgivler.dn42/api/github/activity?limit=1"
 )
 
 var asnPattern = regexp.MustCompile(`(?i)^AS[0-9]{1,10}$`)
@@ -37,7 +40,7 @@ var asnPattern = regexp.MustCompile(`(?i)^AS[0-9]{1,10}$`)
 type app struct {
 	db          *sql.DB
 	page        *template.Template
-        toysPage    *template.Template
+	toysPage    *template.Template
 	ntfyURL     string
 	ntfyToken   string
 	httpClient  *http.Client
@@ -112,7 +115,7 @@ func main() {
 	a := &app{
 		db:        db,
 		page:      page,
-		toysPage: toysPage,
+		toysPage:  toysPage,
 		ntfyURL:   os.Getenv("DN42LANDING_NTFY_URL"),
 		ntfyToken: os.Getenv("DN42LANDING_NTFY_TOKEN"),
 		httpClient: &http.Client{
@@ -134,15 +137,44 @@ func main() {
 		if err != nil {
 			http.Error(w, "stylesheet unavailable", http.StatusInternalServerError)
 			return
-	}
+		}
 
-	w.Header().Set("Content-Type", "text/css; charset=utf-8")
-	w.Header().Set("Cache-Control", "public, max-age=3600")
-	_, _ = w.Write(css)
+		w.Header().Set("Content-Type", "text/css; charset=utf-8")
+		w.Header().Set("Cache-Control", "public, max-age=3600")
+		_, _ = w.Write(css)
 	})
 
 	mux.HandleFunc("GET /", a.handleIndex)
 	mux.HandleFunc("GET /toys", a.handleToys)
+	mux.HandleFunc("GET /toys.js", func(w http.ResponseWriter, r *http.Request) {
+		js, err := staticFS.ReadFile("static/toys.js")
+		if err != nil {
+			http.Error(w, "script unavailable", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "text/javascript; charset=utf-8")
+		w.Header().Set("Cache-Control", "public, max-age=3600")
+		_, _ = w.Write(js)
+	})
+
+	mux.HandleFunc("GET /api/toys/qotd", func(w http.ResponseWriter, r *http.Request) {
+		proxyJSON(
+			w,
+			r,
+			a.httpClient,
+			envOrDefault("DN42LANDING_QOTD_URL", defaultQOTDURL),
+		)
+	})
+
+	mux.HandleFunc("GET /api/toys/git", func(w http.ResponseWriter, r *http.Request) {
+		proxyJSON(
+			w,
+			r,
+			a.httpClient,
+			envOrDefault("DN42LANDING_GIT_URL", defaultGitURL),
+		)
+	})
 	mux.HandleFunc("POST /peering/request", a.handlePeeringRequest)
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
@@ -183,6 +215,47 @@ func main() {
 	}
 
 	log.Fatal(<-errCh)
+}
+
+func proxyJSON(
+	w http.ResponseWriter,
+	r *http.Request,
+	client *http.Client,
+	url string,
+) {
+	req, err := http.NewRequestWithContext(
+		r.Context(),
+		http.MethodGet,
+		url,
+		nil,
+	)
+	if err != nil {
+		http.Error(w, "upstream request failed", http.StatusInternalServerError)
+		return
+	}
+
+	req.Header.Set("Accept", "application/json")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Printf("toy upstream %s: %v", url, err)
+		http.Error(w, "upstream unavailable", http.StatusBadGateway)
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		log.Printf("toy upstream %s returned %s", url, resp.Status)
+		http.Error(w, "upstream unavailable", http.StatusBadGateway)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Cache-Control", "no-store")
+
+	if _, err := io.Copy(w, resp.Body); err != nil {
+		log.Printf("copy toy upstream response: %v", err)
+	}
 }
 
 func initializeDatabase(db *sql.DB) error {

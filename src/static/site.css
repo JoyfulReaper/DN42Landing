@@ -239,3 +239,27 @@ footer {
     padding: 0.45rem;
   }
 }
+
+.toy-output {
+  margin-top: 0.8rem;
+}
+
+.toy-quote {
+  margin-bottom: 0.6rem;
+  font-size: 1.02rem;
+}
+
+.toy-meta {
+  margin-top: 0.4rem;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.toy-code {
+  color: #a8efa8;
+  overflow-wrap: anywhere;
+}
+
+.toy-commit-message {
+  margin-top: 0.45rem;
+}

@@ -1,134 +1,216 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta name="generator" content=
+  "HTML Tidy for HTML5 for Linux version 5.8.0">
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content=
+  "width=device-width, initial-scale=1">
   <title>AS4242420425 — JoyfulReaper on DN42</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='16' fill='%230c0f12'/%3E%3Ctext x='50' y='68' text-anchor='middle' font-family='monospace' font-size='52' font-weight='bold' fill='%2372d572'%3E42%3C/text%3E%3C/svg%3E">
+  <link rel="icon" href=
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='16' fill='%230c0f12'/%3E%3Ctext x='50' y='68' text-anchor='middle' font-family='monospace' font-size='52' font-weight='bold' fill='%2372d572'%3E42%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="/site.css">
 </head>
 <body>
   <header>
     <h1>AS4242420425</h1>
-    <p class="lede">JoyfulReaper / kgivler on DN42 — multi-edge hobby network</p>
+    <p class="lede">JoyfulReaper / kgivler on DN42 — multi-edge
+    hobby network</p>
   </header>
-
   <div class="grid">
     <section class="card">
       <h3>Network</h3>
       <dl>
-        <dt>ASN</dt><dd><code>AS4242420425</code></dd>
-        <dt>IPv4</dt><dd><code>172.20.220.48/28</code></dd>
-        <dt>IPv6</dt><dd><code>fdf0:e12c:5528::/48</code></dd>
-        <dt>Clanker edge</dt><dd>New York, NY</dd>
-        <dt>ScopeCreep edge</dt><dd>Phoenix, AZ</dd>
-        <dt>Routing</dt><dd>BIRD 2 / internal iBGP core</dd>
+        <dt>ASN</dt>
+        <dd><code>AS4242420425</code></dd>
+        <dt>IPv4</dt>
+        <dd><code>172.20.220.48/28</code></dd>
+        <dt>IPv6</dt>
+        <dd><code>fdf0:e12c:5528::/48</code></dd>
+        <dt>Clanker edge</dt>
+        <dd>New York, NY</dd>
+        <dt>ScopeCreep edge</dt>
+        <dd>Phoenix, AZ</dd>
+        <dt>Routing</dt>
+        <dd>BIRD 2 / internal iBGP core</dd>
       </dl>
     </section>
-
     <section class="card">
       <h3>Landing service</h3>
       <dl>
-        <dt>IPv4</dt><dd><code>172.20.220.50</code></dd>
-        <dt>IPv6</dt><dd><code>fdf0:e12c:5528::50</code></dd>
-        <dt>DNS</dt><dd><code>joyfulreaper.dn42</code></dd>
-        <dt>HTTPS</dt><dd>Available via DN42 CA / Burble ACME</dd>
+        <dt>IPv4</dt>
+        <dd><code>172.20.220.50</code></dd>
+        <dt>IPv6</dt>
+        <dd><code>fdf0:e12c:5528::50</code></dd>
+        <dt>DNS</dt>
+        <dd><code>joyfulreaper.dn42</code></dd>
+        <dt>HTTPS</dt>
+        <dd>Available via DN42 CA / Burble ACME</dd>
       </dl>
     </section>
-
     <section class="card">
       <h3>Routing policy</h3>
       <dl>
-        <dt>Peering</dt><dd>Open, manual approval</dd>
-        <dt>Transport</dt><dd>WireGuard</dd>
-        <dt>BGP</dt><dd>MP-BGP / IPv6 link-local</dd>
-        <dt>Validation</dt><dd>DN42 ROA validation</dd>
-        <dt>Transit</dt><dd>Controlled full-table transit currently provided to iEdon</dd>
+        <dt>Peering</dt>
+        <dd>Open, manual approval</dd>
+        <dt>Transport</dt>
+        <dd>WireGuard</dd>
+        <dt>BGP</dt>
+        <dd>MP-BGP / IPv6 link-local</dd>
+        <dt>Validation</dt>
+        <dd>DN42 ROA validation</dd>
+        <dt>Transit</dt>
+        <dd>Controlled full-table transit currently provided to
+        iEdon</dd>
       </dl>
     </section>
   </div>
-
   <h2>About</h2>
-  <p>
-    This is my little corner of DN42: routing experiments, weird services,
-    old protocols, and whatever else seems interesting enough to put on the
-    fake Internet.
-  </p>
-  <p>
-    <strong>AS4242420425 is a multi-edge hobby network experimenting with controlled transit.</strong>
-    I accept DN42 routes from external peers on both Clanker and ScopeCreep. The
-    two edge routers exchange routes over a dedicated WireGuard core using IPv4
-    and IPv6 iBGP. ScopeCreep currently provides full-table IPv4 and IPv6 transit
-    to iEdon using a dedicated alternate-route policy view so traffic received
-    from iEdon is not hairpinned back to that peer. The iEdon peering interface
-    is rate-limited to 50 Mbps in both directions. Transit is experimental, has
-    no SLA, and should not be treated as guaranteed infrastructure.
-  </p>
-  <p class="muted">This is a hobby network. There is no SLA and no uptime guarantee.</p>
-
+  <p>This is my little corner of DN42: routing experiments, weird
+  services, old protocols, and whatever else seems interesting
+  enough to put on the fake Internet.</p>
+  <p><strong>AS4242420425 is a multi-edge hobby network
+  experimenting with controlled transit.</strong> I accept DN42
+  routes from external peers on both Clanker and ScopeCreep. The
+  two edge routers exchange routes over a dedicated WireGuard core
+  using IPv4 and IPv6 iBGP. ScopeCreep currently provides
+  full-table IPv4 and IPv6 transit to iEdon using a dedicated
+  alternate-route policy view so traffic received from iEdon is not
+  hairpinned back to that peer. The iEdon peering interface is
+  rate-limited to 50 Mbps in both directions. Transit is
+  experimental, has no SLA, and should not be treated as guaranteed
+  infrastructure.</p>
+  <p class="muted">This is a hobby network. There is no SLA and no
+  uptime guarantee.</p>
   <h2>Current peers</h2>
   <table>
     <thead>
-      <tr><th>Network</th><th>ASN</th><th>Location</th><th>Edge</th><th>Routing</th><th>State</th></tr>
+      <tr>
+        <th>Network</th>
+        <th>ASN</th>
+        <th>Location</th>
+        <th>Edge</th>
+        <th>Routing</th>
+        <th>State</th>
+      </tr>
     </thead>
     <tbody>
-      <tr><td>RoutedBits</td><td><code>AS4242420207</code></td><td>Newark, NJ</td><td>Clanker</td><td>Valid routes in; own prefixes out</td><td class="status-up">Established</td></tr>
-      <tr><td>Baragoon</td><td><code>AS4242421732</code></td><td>New York, NY</td><td>Clanker</td><td>Valid routes in; own prefixes out</td><td class="status-up">Established</td></tr>
-      <tr><td>HEADSCARF175</td><td><code>AS4242420842</code></td><td>Piscataway, NJ</td><td>Clanker</td><td>Provider role to us; own prefixes out</td><td class="status-up">Established</td></tr>
-      <tr><td>iEdon</td><td><code>AS4242422189</code></td><td>Dallas, TX</td><td>ScopeCreep</td><td>Full table / full transit; 50 Mbps cap</td><td class="status-up">Established</td></tr>
-      <tr><td>Kioubit</td><td><code>AS4242423914</code></td><td>Los Angeles, CA</td><td>ScopeCreep</td><td>Valid routes in; own prefixes out; eligible alternate path for iEdon transit</td><td class="status-up">Established</td></tr>
-      <tr><td>MOE233</td><td><code>AS4242420253</code></td><td>Las Vegas, NV</td><td>ScopeCreep</td><td>Valid routes in; own prefixes out; eligible alternate path for iEdon transit</td><td class="status-up">Established</td></tr>
+      <tr>
+        <td>RoutedBits</td>
+        <td><code>AS4242420207</code></td>
+        <td>Newark, NJ</td>
+        <td>Clanker</td>
+        <td>Valid routes in; own prefixes out</td>
+        <td class="status-up">Established</td>
+      </tr>
+      <tr>
+        <td>Baragoon</td>
+        <td><code>AS4242421732</code></td>
+        <td>New York, NY</td>
+        <td>Clanker</td>
+        <td>Valid routes in; own prefixes out</td>
+        <td class="status-up">Established</td>
+      </tr>
+      <tr>
+        <td>HEADSCARF175</td>
+        <td><code>AS4242420842</code></td>
+        <td>Piscataway, NJ</td>
+        <td>Clanker</td>
+        <td>Provider role to us; own prefixes out</td>
+        <td class="status-up">Established</td>
+      </tr>
+      <tr>
+        <td>iEdon</td>
+        <td><code>AS4242422189</code></td>
+        <td>Dallas, TX</td>
+        <td>ScopeCreep</td>
+        <td>Full table / full transit; 50 Mbps cap</td>
+        <td class="status-up">Established</td>
+      </tr>
+      <tr>
+        <td>Kioubit</td>
+        <td><code>AS4242423914</code></td>
+        <td>Los Angeles, CA</td>
+        <td>ScopeCreep</td>
+        <td>Valid routes in; own prefixes out; eligible alternate
+        path for iEdon transit</td>
+        <td class="status-up">Established</td>
+      </tr>
+      <tr>
+        <td>MOE233</td>
+        <td><code>AS4242420253</code></td>
+        <td>Las Vegas, NV</td>
+        <td>ScopeCreep</td>
+        <td>Valid routes in; own prefixes out; eligible alternate
+        path for iEdon transit</td>
+        <td class="status-up">Established</td>
+      </tr>
     </tbody>
   </table>
-
-  <p class="muted">
-      ScopeCreep's iEdon transit view excludes routes learned directly from iEdon
-      and may instead select routes learned from Kioubit, MOE233, or over the
-      Clanker core. Other external sessions remain own-prefix-only exports unless
-      explicitly configured otherwise.
-  </p>
-
+  <p class="muted">ScopeCreep's iEdon transit view excludes routes
+  learned directly from iEdon and may instead select routes learned
+  from Kioubit, MOE233, or over the Clanker core. Other external
+  sessions remain own-prefix-only exports unless explicitly
+  configured otherwise.</p>
   <h2>Services</h2>
   <ul>
-    <li><strong>Network / peering landing</strong> — <a href="https://joyfulreaper.dn42/">joyfulreaper.dn42</a></li>
-    <li><strong>Personal site</strong> — <a href="https://kgivler.dn42/">kgivler.dn42</a></li>
-    <li><strong>Random Steam Game Picker</strong> — <a href="https://randomsteam.dn42/">randomsteam.dn42</a> (HTTPS required)</li>
-    <li><strong>Random GitHub</strong> — <a href="https://randomgit.dn42/">randomgit.dn42</a></li>
-    <li><strong>IT-Tools</strong> — <a href="https://tools.joyfulreaper.dn42/">tools.joyfulreaper.dn42</a></li>
-    <li><strong>HappyGopher</strong> — <a href="gopher://gopher.kgivler.dn42/">gopher.kgivler.dn42</a> (IPv6-only)</li>
-    <li><strong>Network Toys</strong> — <a href="/toys">joyfulreaper.dn42/toys</a></li>
-    <li>More services will appear as I get around to breaking them.</li>
+    <li>
+      <strong>Network / peering landing</strong> — <a href=
+      "https://joyfulreaper.dn42/">joyfulreaper.dn42</a>
+    </li>
+    <li>
+      <strong>Personal site</strong> — <a href=
+      "https://kgivler.dn42/">kgivler.dn42</a>
+    </li>
+    <li>
+      <strong>Random Steam Game Picker</strong> — <a href=
+      "https://randomsteam.dn42/">randomsteam.dn42</a> (HTTPS
+      required)
+    </li>
+    <li>
+      <strong>Random GitHub</strong> — <a href=
+      "https://randomgit.dn42/">randomgit.dn42</a>
+    </li>
+    <li>
+      <strong>IT-Tools</strong> — <a href=
+      "https://tools.joyfulreaper.dn42/">tools.joyfulreaper.dn42</a>
+    </li>
+    <li>
+      <strong>HappyGopher</strong> — <a href=
+      "gopher://gopher.kgivler.dn42/">gopher.kgivler.dn42</a>
+      (IPv6-only)
+    </li>
+    <li>
+      <strong>Network Toys</strong> — <a href=
+      "/toys">joyfulreaper.dn42/toys</a>
+    </li>
+    <li>More services will appear as I get around to breaking
+    them.</li>
   </ul>
-
-  <p class="warning">
-    <strong>Clearnet resource note:</strong> Some services exposed on DN42 still
-    reference resources hosted on the normal Internet, such as CDN-hosted CSS or
-    JavaScript, images, fonts, APIs, or other external assets. Visiting a
-    <code>.dn42</code> service may therefore cause your browser or client to make
-    additional clearnet requests. A DN42 hostname does not currently guarantee
-    that every resource used by the page remains inside DN42.
-  </p>
-
+  <p class="warning"><strong>Clearnet resource note:</strong> Some
+  services exposed on DN42 still reference resources hosted on the
+  normal Internet, such as CDN-hosted CSS or JavaScript, images,
+  fonts, APIs, or other external assets. Visiting a
+  <code>.dn42</code> service may therefore cause your browser or
+  client to make additional clearnet requests. A DN42 hostname does
+  not currently guarantee that every resource used by the page
+  remains inside DN42.</p>
   <h2>Peering policy</h2>
-  <p>
-    Manual peering requests are open. WireGuard is the preferred tunnel
-    transport. MP-BGP over IPv6 link-local with Extended Next Hop is preferred
-    where supported.
-  </p>
-  <p>
-    Please have valid DN42 registry objects and ROAs. Low-latency North American
-    peers are especially welcome, but they are not a hard requirement.
-  </p>
-  <p>
-    I generate a <strong>fresh WireGuard keypair per approved peer</strong>.
-    There is intentionally no single public WireGuard key shown here. After I
-    approve a request, I create the peer-specific interface and return my public
-    key, UDP port, and link-local details.
-  </p>
-
+  <p>Manual peering requests are open. WireGuard is the preferred
+  tunnel transport. MP-BGP over IPv6 link-local with Extended Next
+  Hop is preferred where supported.</p>
+  <p>Please have valid DN42 registry objects and ROAs. Low-latency
+  North American peers are especially welcome, but they are not a
+  hard requirement.</p>
+  <p>I generate a <strong>fresh WireGuard keypair per approved
+  peer</strong>. There is intentionally no single public WireGuard
+  key shown here. After I approve a request, I create the
+  peer-specific interface and return my public key, UDP port, and
+  link-local details.</p>
   <h3>What to send</h3>
   <ul>
-    <li>which node you would like to peer with: Clanker (New York, NY) or ScopeCreep (Phoenix, AZ)</li>
+    <li>which node you would like to peer with: Clanker (New York,
+    NY) or ScopeCreep (Phoenix, AZ)</li>
     <li>your ASN and network name</li>
     <li>a contact method</li>
     <li>your public WireGuard endpoint</li>
@@ -136,70 +218,56 @@
     <li>your preferred IPv6 link-local addressing, if any</li>
     <li>anything unusual I should know about the session</li>
   </ul>
-
-  <p class="warning">
-    Submitting this form does not automatically configure anything. Requests are
-    reviewed manually. No automatic WireGuard, firewall, BIRD, or route changes
-    are made.
-  </p>
-
+  <p class="warning">Submitting this form does not automatically
+  configure anything. Requests are reviewed manually. No automatic
+  WireGuard, firewall, BIRD, or route changes are made.</p>
   <h2>Request peering</h2>
-
-  <p class="warning">
-    For my sanity, peering requests are globally limited to one submission every
-    15 minutes. If someone beat you to it, wait a bit and try again.
-  </p>
-
-  {{if .Submitted}}
-    <div class="notice">Request received. It has been queued for manual review.</div>
-  {{end}}
-
-  {{if .Error}}
-    <div class="error">{{.Error}}</div>
-  {{end}}
-
+  <p class="warning">For my sanity, peering requests are globally
+  limited to one submission every 15 minutes. If someone beat you
+  to it, wait a bit and try again.</p>{{if .Submitted}}
+  <div class="notice">
+    Request received. It has been queued for manual review.
+  </div>{{end}} {{if .Error}}
+  <div class="error">
+    {{.Error}}
+  </div>{{end}}
   <form method="post" action="/peering/request">
-    <label for="asn">ASN</label>
-    <input id="asn" name="asn" required placeholder="AS4242421234" value="{{.Form.ASN}}">
-
-    <label for="network_name">Network name</label>
-    <input id="network_name" name="network_name" required placeholder="Example Network" value="{{.Form.NetworkName}}">
-
-    <label for="contact">Contact</label>
-    <input id="contact" name="contact" required placeholder="email, Matrix, IRC, etc." value="{{.Form.Contact}}">
-
-    <label for="endpoint">WireGuard endpoint</label>
-    <input id="endpoint" name="endpoint" required placeholder="peer.example.net:12345" value="{{.Form.Endpoint}}">
-
-    <label for="wireguard_public_key">WireGuard public key</label>
-    <input id="wireguard_public_key" name="wireguard_public_key" required
-           placeholder="base64 WireGuard public key"
-           value="{{.Form.WireGuardPublicKey}}">
-
-    <label for="link_local_preference">IPv6 link-local preference</label>
+    <label for="asn">ASN</label> <input id="asn" name="asn"
+    required="" placeholder="AS4242421234" value="{{.Form.ASN}}">
+    <label for="network_name">Network name</label> <input id=
+    "network_name" name="network_name" required="" placeholder=
+    "Example Network" value="{{.Form.NetworkName}}"> <label for=
+    "contact">Contact</label> <input id="contact" name="contact"
+    required="" placeholder="email, Matrix, IRC, etc." value=
+    "{{.Form.Contact}}"> <label for="endpoint">WireGuard
+    endpoint</label> <input id="endpoint" name="endpoint" required=
+    "" placeholder="peer.example.net:12345" value=
+    "{{.Form.Endpoint}}"> <label for=
+    "wireguard_public_key">WireGuard public key</label> <input id=
+    "wireguard_public_key" name="wireguard_public_key" required=""
+    placeholder="base64 WireGuard public key" value=
+    "{{.Form.WireGuardPublicKey}}"> <label for=
+    "link_local_preference">IPv6 link-local preference</label>
     <input id="link_local_preference" name="link_local_preference"
-           placeholder="e.g. you fe80::1234, me fe80::425"
-           value="{{.Form.LinkLocalPreference}}">
-
-    <label for="notes">Notes</label>
-    <textarea id="notes" name="notes"
-              placeholder="Preferred edge (Clanker/New York or ScopeCreep/Phoenix), BGP capabilities, routing policy, weirdness, etc.">{{.Form.Notes}}</textarea>
-
+    placeholder="e.g. you fe80::1234, me fe80::425" value=
+    "{{.Form.LinkLocalPreference}}"> <label for=
+    "notes">Notes</label> 
+    <textarea id="notes" name="notes" placeholder=
+    "Preferred edge (Clanker/New York or ScopeCreep/Phoenix), BGP capabilities, routing policy, weirdness, etc.">
+    {{.Form.Notes}}</textarea>
     <div class="honeypot" aria-hidden="true">
-      <label for="website">Website</label>
-      <input id="website" name="website" tabindex="-1" autocomplete="off">
-    </div>
-
-    <button type="submit">Submit peering request</button>
+      <label for="website">Website</label> <input id="website"
+      name="website" tabindex="-1" autocomplete="off">
+    </div><button type="submit">Submit peering request</button>
   </form>
-
   <h2>Operator notes</h2>
-  <p class="muted">
-    Basic request metadata is stored locally for peering administration.
-    Peering submissions are stored in SQLite and may trigger a private ntfy
-    notification. There are no third-party analytics or advertising services.
-  </p>
-
-  <footer>AS4242420425 · DN42 · probably overengineered for a hobby network</footer>
+  <p class="muted">Basic request metadata is stored locally for
+  peering administration. Peering submissions are stored in SQLite
+  and may trigger a private ntfy notification. There are no
+  third-party analytics or advertising services.</p>
+  <footer>
+    AS4242420425 · DN42 · probably overengineered for a hobby
+    network
+  </footer>
 </body>
 </html>
