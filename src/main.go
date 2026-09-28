@@ -27,7 +27,7 @@ var staticFS embed.FS
 
 const (
 	defaultIPv4Listen = "172.20.220.50:80"
-	defaultIPv6Listen = "[fdf0:e12c:5528::10]:80"
+	defaultIPv6Listen = "[fdf0:e12c:5528::50]:80"
 	defaultDBPath     = "/var/lib/dn42landing/peering.db"
 	defaultNtfyURL    = "http://127.0.0.1:5197/dn42-peering"
 )

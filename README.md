@@ -17,26 +17,34 @@ The project is intentionally boring:
 - ASN: `AS4242420425`
 - IPv4 prefix: `172.20.220.48/28`
 - IPv6 prefix: `fdf0:e12c:5528::/48`
-- Location: New York, US
-- Router: Clanker
+- Edge routers: Clanker and ScopeCreep
 - Routing daemon: BIRD 2
+- Internal routing: IPv4/IPv6 iBGP over a dedicated WireGuard core
 - Peering transport: WireGuard
 - BGP: MP-BGP over IPv6 link-local, Extended Next Hop where supported
 - Route validation: DN42 ROA validation
 
-Planned landing addresses:
+Shared web-service ingress:
 
 - IPv4: `172.20.220.50`
-- IPv6: `fdf0:e12c:5528::10`
+- IPv6: `fdf0:e12c:5528::50`
+
+Current DN42 web services:
+
+- `joyfulreaper.dn42` — network / peering landing
+- `kgivler.dn42` — personal site
+- `randomsteam.dn42` — Random Steam Game Picker
+- `randomgit.dn42` — Random GitHub
 
 ## Peering policy
 
 Manual peering requests are open.
 
-AS4242420425 currently operates as a **stub network** and exports only its own
-registered prefixes. Providing DN42 transit is explicitly in scope for future
-experimentation, but peers must not currently depend on AS4242420425 for
-transit.
+AS4242420425 currently operates as a **multi-edge, non-transit hobby network**.
+It accepts DN42 routes from external peers on both Clanker and ScopeCreep and
+currently exports only its own registered prefixes. Providing DN42 transit is
+in scope for future experimentation, but peers must not currently depend on
+AS4242420425 for transit.
 
 This is a hobby network. No SLA or uptime guarantee is provided.
 
@@ -98,7 +106,7 @@ Environment variables:
 | Variable | Default |
 |---|---|
 | `DN42LANDING_IPV4_LISTEN` | `172.20.220.50:80` |
-| `DN42LANDING_IPV6_LISTEN` | `[fdf0:e12c:5528::10]:80` |
+| `DN42LANDING_IPV6_LISTEN` | `[fdf0:e12c:5528::50]:80` |
 | `DN42LANDING_DB` | `/var/lib/dn42landing/peering.db` |
 | `DN42LANDING_NTFY_URL` | `http://127.0.0.1:5197/dn42-peering` |
 | `DN42LANDING_NTFY_TOKEN` | empty |
@@ -113,7 +121,7 @@ before changing however `dn42-dummy` is persisted on Clanker:
 
 ```bash
 sudo ip addr add 172.20.220.50/32 dev dn42-dummy
-sudo ip -6 addr add fdf0:e12c:5528::10/128 dev dn42-dummy
+sudo ip -6 addr add fdf0:e12c:5528::50/128 dev dn42-dummy
 
 ip -br addr show dn42-dummy
 ```
@@ -157,7 +165,7 @@ Test from another DN42-connected host:
 
 ```bash
 curl -v --connect-timeout 5 http://172.20.220.50/
-curl -g -v --connect-timeout 5 'http://[fdf0:e12c:5528::10]/'
+curl -g -v --connect-timeout 5 'http://[fdf0:e12c:5528::50]/'
 ```
 
 ## SQLite
@@ -173,15 +181,21 @@ sudo sqlite3 /var/lib/dn42landing/peering.db \
 
 No peering request data is exposed through a public HTTP endpoint.
 
-## Next steps
+## DN42 web/TLS status
 
-After plain HTTP is working:
+The registered DN42 names are live through the shared `.50` / `::50` nginx
+ingress. Certificates are issued through Burble's DN42 ACME service and chain
+to the DN42 certificate authority.
 
-1. persist the `.50` / `::10` addresses on Clanker
-2. prepare ScopeCreep for DN42/Ygg routing through Clanker
-3. add authoritative DNS
-4. register `kgivler.dn42`
-5. register `randomsteam.dn42`
-6. add reverse DNS
-7. investigate DN42 CA / ACME and HTTPS
-8. publish Random Steam over DN42
+`randomsteam.dn42` redirects HTTP to HTTPS. The other current web services
+support both HTTP and HTTPS without forcing a redirect.
+
+### Clearnet resource caveat
+
+DN42 reachability does **not** currently imply DN42-only browsing. Some services
+may reference resources on the normal Internet, including CDN-hosted CSS or
+JavaScript, images, fonts, APIs, and other external assets. A browser visiting a
+`.dn42` hostname may therefore make additional clearnet requests.
+
+The landing page itself is intentionally self-contained, but that should not be
+assumed for every service linked from it.
