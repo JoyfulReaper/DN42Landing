@@ -208,16 +208,16 @@
       <tr><td>Baragoon</td><td><code>AS4242421732</code></td><td>New York, NY</td><td>Clanker</td><td>Valid routes in; own prefixes out</td><td class="status-up">Established</td></tr>
       <tr><td>HEADSCARF175</td><td><code>AS4242420842</code></td><td>Piscataway, NJ</td><td>Clanker</td><td>Provider role to us; own prefixes out</td><td class="status-up">Established</td></tr>
       <tr><td>iEdon</td><td><code>AS4242422189</code></td><td>Dallas, TX</td><td>ScopeCreep</td><td>Full table / full transit; 50 Mbps cap</td><td class="status-up">Established</td></tr>
-      <tr><td>Kioubit</td><td><code>AS4242423914</code></td><td>Los Angeles, CA</td><td>ScopeCreep</td><td>Valid routes in; own prefixes out; iEdon transit exit</td><td class="status-up">Established</td></tr>
-      <tr><td>MOE233</td><td><code>AS4242420253</code></td><td>Las Vegas, NV</td><td>ScopeCreep</td><td>Valid routes in; own prefixes out; iEdon transit exit</td><td class="status-up">Established</td></tr>
+      <tr><td>Kioubit</td><td><code>AS4242423914</code></td><td>Los Angeles, CA</td><td>ScopeCreep</td><td>Valid routes in; own prefixes out; eligible alternate path for iEdon transit</td><td class="status-up">Established</td></tr>
+      <tr><td>MOE233</td><td><code>AS4242420253</code></td><td>Las Vegas, NV</td><td>ScopeCreep</td><td>Valid routes in; own prefixes out; eligible alternate path for iEdon transit</td><td class="status-up">Established</td></tr>
     </tbody>
   </table>
 
   <p class="muted">
-    ScopeCreep's iEdon transit view excludes routes learned directly from iEdon
-    and can select Kioubit, MOE233, or routes learned over the Clanker core as
-    alternate forwarding paths. Other external sessions remain own-prefix-only
-    exports unless explicitly configured otherwise.
+      ScopeCreep's iEdon transit view excludes routes learned directly from iEdon
+      and may instead select routes learned from Kioubit, MOE233, or over the
+      Clanker core. Other external sessions remain own-prefix-only exports unless
+      explicitly configured otherwise.
   </p>
 
   <h2>Services</h2>
