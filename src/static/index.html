@@ -175,7 +175,7 @@
         <dt>Transport</dt><dd>WireGuard</dd>
         <dt>BGP</dt><dd>MP-BGP / IPv6 link-local</dd>
         <dt>Validation</dt><dd>DN42 ROA validation</dd>
-        <dt>Transit</dt><dd>Not currently provided</dd>
+        <dt>Transit</dt><dd>Controlled full-table transit currently provided to iEdon</dd>
       </dl>
     </section>
   </div>
@@ -187,29 +187,38 @@
     fake Internet.
   </p>
   <p>
-    <strong>AS4242420425 is a multi-edge, non-transit hobby network.</strong>
-    I accept DN42 routes from external peers on both Clanker and ScopeCreep and
-    currently export only my own registered prefixes. The two edge routers
-    exchange routes over a dedicated WireGuard core using IPv4 and IPv6 iBGP.
-    Providing DN42 transit may become a future experiment, but peers should not
-    currently depend on this network for transit.
+    <strong>AS4242420425 is a multi-edge hobby network experimenting with controlled transit.</strong>
+    I accept DN42 routes from external peers on both Clanker and ScopeCreep. The
+    two edge routers exchange routes over a dedicated WireGuard core using IPv4
+    and IPv6 iBGP. ScopeCreep currently provides full-table IPv4 and IPv6 transit
+    to iEdon using a dedicated alternate-route policy view so traffic received
+    from iEdon is not hairpinned back to that peer. The iEdon peering interface
+    is rate-limited to 50 Mbps in both directions. Transit is experimental, has
+    no SLA, and should not be treated as guaranteed infrastructure.
   </p>
   <p class="muted">This is a hobby network. There is no SLA and no uptime guarantee.</p>
 
   <h2>Current peers</h2>
   <table>
     <thead>
-      <tr><th>Network</th><th>ASN</th><th>Location</th><th>Edge</th><th>State</th></tr>
+      <tr><th>Network</th><th>ASN</th><th>Location</th><th>Edge</th><th>Routing</th><th>State</th></tr>
     </thead>
     <tbody>
-      <tr><td>RoutedBits</td><td><code>AS4242420207</code></td><td>Newark, NJ</td><td>Clanker</td><td class="status-up">Established</td></tr>
-      <tr><td>Baragoon</td><td><code>AS4242421732</code></td><td>New York, NY</td><td>Clanker</td><td class="status-up">Established</td></tr>
-      <tr><td>HEADSCARF175</td><td><code>AS4242420842</code></td><td>Piscataway, NJ</td><td>Clanker</td><td class="status-up">Established</td></tr>
-      <tr><td>iEdon</td><td><code>AS4242422189</code></td><td>Dallas, TX</td><td>ScopeCreep</td><td class="status-up">Established</td></tr>
-      <tr><td>Kioubit</td><td><code>AS4242423914</code></td><td>Los Angeles, CA</td><td>ScopeCreep</td><td class="status-up">Established</td></tr>
-      <tr><td>MOE233</td><td><code>AS4242420253</code></td><td>Las Vegas, NV</td><td>ScopeCreep</td><td class="status-up">Established</td></tr>
+      <tr><td>RoutedBits</td><td><code>AS4242420207</code></td><td>Newark, NJ</td><td>Clanker</td><td>Valid routes in; own prefixes out</td><td class="status-up">Established</td></tr>
+      <tr><td>Baragoon</td><td><code>AS4242421732</code></td><td>New York, NY</td><td>Clanker</td><td>Valid routes in; own prefixes out</td><td class="status-up">Established</td></tr>
+      <tr><td>HEADSCARF175</td><td><code>AS4242420842</code></td><td>Piscataway, NJ</td><td>Clanker</td><td>Provider role to us; own prefixes out</td><td class="status-up">Established</td></tr>
+      <tr><td>iEdon</td><td><code>AS4242422189</code></td><td>Dallas, TX</td><td>ScopeCreep</td><td>Full table / full transit; 50 Mbps cap</td><td class="status-up">Established</td></tr>
+      <tr><td>Kioubit</td><td><code>AS4242423914</code></td><td>Los Angeles, CA</td><td>ScopeCreep</td><td>Valid routes in; own prefixes out; iEdon transit exit</td><td class="status-up">Established</td></tr>
+      <tr><td>MOE233</td><td><code>AS4242420253</code></td><td>Las Vegas, NV</td><td>ScopeCreep</td><td>Valid routes in; own prefixes out; iEdon transit exit</td><td class="status-up">Established</td></tr>
     </tbody>
   </table>
+
+  <p class="muted">
+    ScopeCreep's iEdon transit view excludes routes learned directly from iEdon
+    and can select Kioubit, MOE233, or routes learned over the Clanker core as
+    alternate forwarding paths. Other external sessions remain own-prefix-only
+    exports unless explicitly configured otherwise.
+  </p>
 
   <h2>Services</h2>
   <ul>
@@ -218,6 +227,7 @@
     <li><strong>Random Steam Game Picker</strong> — <a href="https://randomsteam.dn42/">randomsteam.dn42</a> (HTTPS required)</li>
     <li><strong>Random GitHub</strong> — <a href="https://randomgit.dn42/">randomgit.dn42</a></li>
     <li><strong>IT-Tools</strong> — <a href="https://tools.joyfulreaper.dn42/">tools.joyfulreaper.dn42</a></li>
+    <li><strong>HappyGopher</strong> — <a href="gopher://gopher.kgivler.dn42/">gopher.kgivler.dn42</a> (IPv6-only)</li>
     <li>More services will appear as I get around to breaking them.</li>
   </ul>
 
@@ -249,6 +259,7 @@
 
   <h3>What to send</h3>
   <ul>
+    <li>which node you would like to peer with: Clanker (New York, NY) or ScopeCreep (Phoenix, AZ)</li>
     <li>your ASN and network name</li>
     <li>a contact method</li>
     <li>your public WireGuard endpoint</li>
@@ -303,7 +314,7 @@
 
     <label for="notes">Notes</label>
     <textarea id="notes" name="notes"
-              placeholder="BGP capabilities, preferred direction, location, weirdness, etc.">{{.Form.Notes}}</textarea>
+              placeholder="Preferred edge (Clanker/New York or ScopeCreep/Phoenix), BGP capabilities, routing policy, weirdness, etc.">{{.Form.Notes}}</textarea>
 
     <div class="honeypot" aria-hidden="true">
       <label for="website">Website</label>
