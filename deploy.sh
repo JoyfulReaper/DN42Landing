@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $EUID -eq 0 ]]; then
+    echo "Run this script as your normal user, not with sudo."
+    exit 1
+fi
 
 cd /opt/dn42landing/src
 
