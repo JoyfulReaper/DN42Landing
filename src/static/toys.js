@@ -9,6 +9,20 @@ function textElement(tag, text, className = "") {
   return element;
 }
 
+function formatStorage(storage) {
+  if (storage === null || storage === undefined) {
+    return "Unknown";
+  }
+
+  return String(storage).replace(/[\d.]+(?=GB)/g, match => {
+    const parsed = parseFloat(match);
+
+    return Number.isFinite(parsed)
+      ? parsed.toFixed(1)
+      : match;
+  });
+}
+
 async function loadQotd() {
   const container = document.getElementById("qotd");
   if (!container) return;
@@ -223,7 +237,7 @@ async function loadWorkstation() {
       ["Uptime", status.uptime || "Unknown"],
       ["CPU", `${status.cpuUsage || "?"} / ${status.cpuCores || "?"} cores`],
       ["RAM", status.ram || "Unknown"],
-      ["Storage", status.storage || "Unknown"],
+      ["Storage", formatStorage(status.storage)],
       ["GPU", status.gpu?.name || "Unknown"],
       [
         "GPU load",
