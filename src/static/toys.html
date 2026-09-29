@@ -69,7 +69,11 @@
         "toy-service">HAPPYQOTD</span>
       </div>
       <p class="muted">Suggest something for the quote collection.
-      Submissions are reviewed manually.</p>
+      Submissions are reviewed manually.</p>{{if .QuoteSubmitted}}
+      <div class="notice">
+        Quote suggestion submitted. Thanks — I'll review it before
+        adding it to HappyQOTD.
+      </div>{{end}}
       <form class="toy-form" method="post" action=
       "/toys/quotes/suggest">
         <label for="quote_text">Quote</label> 

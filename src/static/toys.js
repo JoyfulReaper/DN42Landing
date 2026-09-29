@@ -272,8 +272,6 @@ document
     void loadWorkstation();
   });
 
-void loadWorkstation();
-
 document
   .getElementById("random-quote-refresh")
   ?.addEventListener("click", () => {
