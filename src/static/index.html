@@ -60,8 +60,7 @@
         <dt>Validation</dt>
         <dd>DN42 ROA validation</dd>
         <dt>Transit</dt>
-        <dd>Controlled full-table transit currently provided to
-        iEdon</dd>
+        <dd>Controlled full-table transit configured for Baragoon and iEdon</dd>
       </dl>
     </section>
   </div>
@@ -73,13 +72,22 @@
   experimenting with controlled transit.</strong> I accept DN42
   routes from external peers on both Clanker and ScopeCreep. The
   two edge routers exchange routes over a dedicated WireGuard core
-  using IPv4 and IPv6 iBGP. ScopeCreep currently provides
-  full-table IPv4 and IPv6 transit to iEdon using a dedicated
-  alternate-route policy view so traffic received from iEdon is not
-  hairpinned back to that peer. The iEdon peering interface is
-  rate-limited to 50 Mbps in both directions. Transit is
-  experimental, has no SLA, and should not be treated as guaranteed
-  infrastructure.</p>
+  using IPv4 and IPv6 iBGP.</p>
+  <p>Clanker currently provides controlled full-table IPv4 and IPv6
+  transit to Baragoon using dedicated alternate routing tables
+  (<code>baragoon_transit4</code> and
+  <code>baragoon_transit6</code>) and Linux policy routing table
+  <code>1732</code>. Traffic for my own prefixes bypasses the
+  transit policy, and routes learned directly from Baragoon are
+  excluded from the return transit view to avoid hairpinning traffic
+  back to the same peer. The Baragoon peering interface is
+  rate-limited to 50 Mbps in both directions. The policy is live,
+  although no real third-party transit packet has yet been observed.</p>
+  <p>ScopeCreep provides full-table IPv4 and IPv6 transit to iEdon
+  using a dedicated alternate-route policy view with equivalent
+  anti-hairpin behavior. The iEdon peering interface is also
+  rate-limited to 50 Mbps in both directions. Transit is experimental,
+  has no SLA, and should not be treated as guaranteed infrastructure.</p>
   <p class="muted">This is a hobby network. There is no SLA and no
   uptime guarantee.</p>
   <h2>Current peers</h2>
@@ -108,7 +116,7 @@
         <td><code>AS4242421732</code></td>
         <td>New York, NY</td>
         <td>Clanker</td>
-        <td>Valid routes in; own prefixes out</td>
+        <td>Full table / controlled transit; 50 Mbps cap</td>
         <td class="status-up">Established</td>
       </tr>
       <tr>
@@ -124,7 +132,7 @@
         <td><code>AS4242422189</code></td>
         <td>Dallas, TX</td>
         <td>ScopeCreep</td>
-        <td>Full table / full transit; 50 Mbps cap</td>
+        <td>Full table / controlled transit; 50 Mbps cap</td>
         <td class="status-up">Established</td>
       </tr>
       <tr>
@@ -147,11 +155,13 @@
       </tr>
     </tbody>
   </table>
-  <p class="muted">ScopeCreep's iEdon transit view excludes routes
-  learned directly from iEdon and may instead select routes learned
-  from Kioubit, MOE233, or over the Clanker core. Other external
-  sessions remain own-prefix-only exports unless explicitly
-  configured otherwise.</p>
+  <p class="muted">Clanker's Baragoon transit view excludes routes
+  learned directly from Baragoon and uses alternate paths learned
+  from other peers or over the ScopeCreep core. ScopeCreep's iEdon
+  transit view similarly excludes routes learned directly from iEdon
+  and may instead select routes learned from Kioubit, MOE233, or
+  over the Clanker core. Other external sessions remain
+  own-prefix-only exports unless explicitly configured otherwise.</p>
   <h2>Services</h2>
   <ul>
     <li>
@@ -182,7 +192,7 @@
     </li>
     <li>
       <strong>Network Toys</strong> — <a href=
-      "/toys">joyfulreaper.dn42/toys</a>
+      "https://joyfulreaper.dn42/toys">joyfulreaper.dn42/toys</a>
     </li>
     <li>More services will appear as I get around to breaking
     them.</li>

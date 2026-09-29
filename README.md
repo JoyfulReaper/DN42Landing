@@ -40,13 +40,28 @@ Current DN42 web services:
 
 Manual peering requests are open.
 
-AS4242420425 currently operates as a **multi-edge, non-transit hobby network**.
-It accepts DN42 routes from external peers on both Clanker and ScopeCreep and
-currently exports only its own registered prefixes. Providing DN42 transit is
-in scope for future experimentation, but peers must not currently depend on
-AS4242420425 for transit.
+AS4242420425 operates as a **multi-edge hobby network experimenting with
+controlled transit**. It accepts DN42 routes from external peers on both
+Clanker and ScopeCreep. Most external sessions remain own-prefix-only exports
+unless explicitly configured otherwise.
 
-This is a hobby network. No SLA or uptime guarantee is provided.
+Clanker currently provides controlled full-table IPv4 and IPv6 transit to
+Baragoon (`AS4242421732`). The transit policy uses dedicated BIRD alternate
+tables (`baragoon_transit4` and `baragoon_transit6`) together with Linux policy
+routing table `1732`. Traffic to AS4242420425's own prefixes bypasses the
+transit policy, and routes learned directly from Baragoon are excluded from
+the return transit view to prevent hairpinning traffic back to the same peer.
+The Baragoon peering interface is rate-limited to 50 Mbps in both directions.
+The policy is live, although no real third-party transit packet has yet been
+observed.
+
+ScopeCreep also provides controlled full-table IPv4 and IPv6 transit to iEdon
+(`AS4242422189`) using a dedicated alternate-route policy view with equivalent
+anti-hairpin behavior. That peering interface is also limited to 50 Mbps in
+both directions.
+
+Transit is experimental. This is a hobby network; no SLA or uptime guarantee
+is provided.
 
 A fresh WireGuard keypair is generated for each approved peer. There is no
 single public WireGuard key because peer-specific keys make rotation and
@@ -187,8 +202,15 @@ The registered DN42 names are live through the shared `.50` / `::50` nginx
 ingress. Certificates are issued through Burble's DN42 ACME service and chain
 to the DN42 certificate authority.
 
-`randomsteam.dn42` redirects HTTP to HTTPS. The other current web services
-support both HTTP and HTTPS without forcing a redirect.
+The primary web hostnames use HTTPS as their canonical form:
+
+- `http://kgivler.dn42/*` redirects to `https://kgivler.dn42/*`
+- `http://randomgit.dn42/*` redirects to `https://randomgit.dn42/*`
+- `http://randomsteam.dn42/*` redirects to `https://randomsteam.dn42/*`
+
+The corresponding `www.*.dn42` aliases are present in DNS and covered by the
+Burble-issued certificates. Both HTTP and HTTPS requests to those aliases
+redirect to the bare HTTPS hostname while preserving the path and query string.
 
 ### Clearnet resource caveat
 
