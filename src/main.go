@@ -33,26 +33,35 @@ const (
 
 	defaultQOTDURL       = "https://qotd.kgivler.dn42/api/quotes/today"
 	defaultRandomQOTDURL = "https://qotd.kgivler.dn42/api/quotes/random"
-	defaultGitURL        = "https://api.kgivler.dn42/api/github/activity?limit=1"
+	defaultGitURL        = "https://api.kgivler.dn42/api/github/activity?limit=5"
 	defaultStatusURL     = "https://api.kgivler.dn42/api/system/status"
 )
 
 var asnPattern = regexp.MustCompile(`(?i)^AS[0-9]{1,10}$`)
 
 type app struct {
-	db          *sql.DB
-	page        *template.Template
-	toysPage    *template.Template
-	ntfyURL     string
-	ntfyToken   string
-	httpClient  *http.Client
-	rateLimiter *globalRateLimiter
+	db *sql.DB
+
+	page     *template.Template
+	toysPage *template.Template
+
+	ntfyURL   string
+	ntfyToken string
+
+	httpClient *http.Client
+
+	peeringRateLimiter *globalRateLimiter
+	quoteRateLimiter   *globalRateLimiter
 }
 
 type pageData struct {
 	Submitted bool
 	Error     string
 	Form      peeringRequest
+}
+
+type toysPageData struct {
+	QuoteSubmitted bool
 }
 
 type peeringRequest struct {
@@ -65,6 +74,15 @@ type peeringRequest struct {
 	Notes               string
 	RemoteAddress       string
 	UserAgent           string
+}
+
+type quoteSuggestion struct {
+	Text          string
+	Author        string
+	Source        string
+	Notes         string
+	RemoteAddress string
+	UserAgent     string
 }
 
 type globalRateLimiter struct {
@@ -109,9 +127,18 @@ func main() {
 		log.Fatalf("parse page template: %v", err)
 	}
 
-	rateLimit, err := time.ParseDuration(envOrDefault("DN42LANDING_RATE_LIMIT", "15m"))
+	peeringRateLimit, err := time.ParseDuration(
+		envOrDefault("DN42LANDING_RATE_LIMIT", "15m"),
+	)
 	if err != nil {
 		log.Fatalf("invalid DN42LANDING_RATE_LIMIT: %v", err)
+	}
+
+	quoteRateLimit, err := time.ParseDuration(
+		envOrDefault("DN42LANDING_QUOTE_RATE_LIMIT", "5m"),
+	)
+	if err != nil {
+		log.Fatalf("invalid DN42LANDING_QUOTE_RATE_LIMIT: %v", err)
 	}
 
 	a := &app{
@@ -123,8 +150,11 @@ func main() {
 		httpClient: &http.Client{
 			Timeout: 3 * time.Second,
 		},
-		rateLimiter: &globalRateLimiter{
-			interval: rateLimit,
+		peeringRateLimiter: &globalRateLimiter{
+			interval: peeringRateLimit,
+		},
+		quoteRateLimiter: &globalRateLimiter{
+			interval: quoteRateLimit,
 		},
 	}
 
@@ -197,6 +227,7 @@ func main() {
 	})
 
 	mux.HandleFunc("POST /peering/request", a.handlePeeringRequest)
+	mux.HandleFunc("POST /toys/quotes/suggest", a.handleQuoteSuggestion)
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		_, _ = io.WriteString(w, "ok\n")
@@ -285,21 +316,36 @@ func initializeDatabase(db *sql.DB) error {
 		`PRAGMA synchronous = NORMAL;`,
 		`PRAGMA busy_timeout = 5000;`,
 		`CREATE TABLE IF NOT EXISTS peering_requests (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			submitted_utc TEXT NOT NULL,
-			asn TEXT NOT NULL,
-			network_name TEXT NOT NULL,
-			contact TEXT NOT NULL,
-			endpoint TEXT NOT NULL,
-			wireguard_public_key TEXT NOT NULL,
-			link_local_preference TEXT NOT NULL DEFAULT '',
-			notes TEXT NOT NULL DEFAULT '',
-			remote_address TEXT NOT NULL,
-			user_agent TEXT NOT NULL DEFAULT '',
-			status TEXT NOT NULL DEFAULT 'Pending'
-		);`,
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        submitted_utc TEXT NOT NULL,
+                        asn TEXT NOT NULL,
+                        network_name TEXT NOT NULL,
+                        contact TEXT NOT NULL,
+                        endpoint TEXT NOT NULL,
+                        wireguard_public_key TEXT NOT NULL,
+                        link_local_preference TEXT NOT NULL DEFAULT '',
+                        notes TEXT NOT NULL DEFAULT '',
+                        remote_address TEXT NOT NULL,
+                        user_agent TEXT NOT NULL DEFAULT '',
+                        status TEXT NOT NULL DEFAULT 'Pending'
+                );`,
+
+		`CREATE TABLE IF NOT EXISTS quote_suggestions (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        submitted_utc TEXT NOT NULL,
+                        quote_text TEXT NOT NULL,
+                        author TEXT NOT NULL DEFAULT '',
+                        source TEXT NOT NULL DEFAULT '',
+                        notes TEXT NOT NULL DEFAULT '',
+                        remote_address TEXT NOT NULL,
+                        user_agent TEXT NOT NULL DEFAULT '',
+                        status TEXT NOT NULL DEFAULT 'Pending'
+                );`,
+
+		`CREATE INDEX IF NOT EXISTS idx_quote_suggestions_status_submitted
+    ON quote_suggestions(status, submitted_utc DESC);`,
 		`CREATE INDEX IF NOT EXISTS idx_peering_requests_status_submitted
-			ON peering_requests(status, submitted_utc DESC);`,
+                        ON peering_requests(status, submitted_utc DESC);`,
 	}
 
 	for _, statement := range statements {
@@ -358,7 +404,7 @@ func (a *app) handlePeeringRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !a.rateLimiter.allow() {
+	if !a.peeringRateLimiter.allow() {
 		http.Error(
 			w,
 			"For my sanity, peering requests are globally limited to one submission every 15 minutes. If someone beat you to it, wait a bit and try again.",
@@ -370,18 +416,18 @@ func (a *app) handlePeeringRequest(w http.ResponseWriter, r *http.Request) {
 	result, err := a.db.ExecContext(
 		r.Context(),
 		`INSERT INTO peering_requests (
-			submitted_utc,
-			asn,
-			network_name,
-			contact,
-			endpoint,
-			wireguard_public_key,
-			link_local_preference,
-			notes,
-			remote_address,
-			user_agent,
-			status
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')`,
+                        submitted_utc,
+                        asn,
+                        network_name,
+                        contact,
+                        endpoint,
+                        wireguard_public_key,
+                        link_local_preference,
+                        notes,
+                        remote_address,
+                        user_agent,
+                        status
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')`,
 		time.Now().UTC().Format(time.RFC3339),
 		strings.ToUpper(req.ASN),
 		req.NetworkName,
@@ -412,12 +458,109 @@ func (a *app) handlePeeringRequest(w http.ResponseWriter, r *http.Request) {
 			req.RemoteAddress,
 		)
 
-		if err := a.publishNtfy(r.Context(), notice); err != nil {
+		if err := a.publishNtfyMessage(
+			r.Context(),
+			"DN42 peering request",
+			"satellite",
+			notice,
+		); err != nil {
 			log.Printf("ntfy notification failed for request %d: %v", id, err)
 		}
 	}
 
 	http.Redirect(w, r, "/?submitted=1", http.StatusSeeOther)
+}
+
+func (a *app) handleQuoteSuggestion(w http.ResponseWriter, r *http.Request) {
+	r.Body = http.MaxBytesReader(w, r.Body, 8*1024)
+
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Invalid form submission.", http.StatusBadRequest)
+		return
+	}
+
+	// Honeypot. Humans never see this field.
+	if strings.TrimSpace(r.FormValue("quote_website")) != "" {
+		http.Redirect(w, r, "/toys?quote_submitted=1", http.StatusSeeOther)
+		return
+	}
+
+	suggestion := quoteSuggestion{
+		Text:          clean(r.FormValue("quote_text"), 1000),
+		Author:        clean(r.FormValue("quote_author"), 200),
+		Source:        clean(r.FormValue("quote_source"), 300),
+		Notes:         clean(r.FormValue("quote_notes"), 500),
+		RemoteAddress: requestRemoteHost(r),
+		UserAgent:     clean(r.UserAgent(), 300),
+	}
+
+	if suggestion.Text == "" {
+		http.Error(w, "Quote text is required.", http.StatusBadRequest)
+		return
+	}
+
+	if !a.quoteRateLimiter.allow() {
+		http.Error(
+			w,
+			"Quote suggestions are limited to one submission every 5 minutes. Try again in a bit.",
+			http.StatusTooManyRequests,
+		)
+		return
+	}
+
+	result, err := a.db.ExecContext(
+		r.Context(),
+		`INSERT INTO quote_suggestions (
+                        submitted_utc,
+                        quote_text,
+                        author,
+                        source,
+                        notes,
+                        remote_address,
+                        user_agent,
+                        status
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, 'Pending')`,
+		time.Now().UTC().Format(time.RFC3339),
+		suggestion.Text,
+		suggestion.Author,
+		suggestion.Source,
+		suggestion.Notes,
+		suggestion.RemoteAddress,
+		suggestion.UserAgent,
+	)
+	if err != nil {
+		log.Printf("save quote suggestion: %v", err)
+		http.Error(w, "Unable to save suggestion.", http.StatusInternalServerError)
+		return
+	}
+
+	id, _ := result.LastInsertId()
+
+	if a.ntfyURL != "" {
+		notice := fmt.Sprintf(
+			"Quote suggestion #%d\nQuote: %s\nAuthor: %s\nSource: %s\nFrom: %s",
+			id,
+			suggestion.Text,
+			suggestion.Author,
+			suggestion.Source,
+			suggestion.RemoteAddress,
+		)
+
+		if err := a.publishNtfyMessage(
+			r.Context(),
+			"DN42 quote suggestion",
+			"memo",
+			notice,
+		); err != nil {
+			log.Printf(
+				"quote suggestion ntfy failed for %d: %v",
+				id,
+				err,
+			)
+		}
+	}
+
+	http.Redirect(w, r, "/toys?quote_submitted=1", http.StatusSeeOther)
 }
 
 func (a *app) handleToys(w http.ResponseWriter, r *http.Request) {
@@ -426,7 +569,11 @@ func (a *app) handleToys(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Referrer-Policy", "no-referrer")
 	w.Header().Set("X-Frame-Options", "DENY")
 
-	if err := a.toysPage.Execute(w, nil); err != nil {
+	data := toysPageData{
+		QuoteSubmitted: r.URL.Query().Get("quote_submitted") == "1",
+	}
+
+	if err := a.toysPage.Execute(w, data); err != nil {
 		log.Printf("render toys page: %v", err)
 	}
 }
@@ -470,18 +617,28 @@ func validateWireGuardPublicKey(value string) error {
 	return nil
 }
 
-func (a *app) publishNtfy(parent context.Context, body string) error {
+func (a *app) publishNtfyMessage(
+	parent context.Context,
+	title string,
+	tags string,
+	body string,
+) error {
 	ctx, cancel := context.WithTimeout(parent, 3*time.Second)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, a.ntfyURL, strings.NewReader(body))
+	req, err := http.NewRequestWithContext(
+		ctx,
+		http.MethodPost,
+		a.ntfyURL,
+		strings.NewReader(body),
+	)
 	if err != nil {
 		return err
 	}
 
-	req.Header.Set("Title", "DN42 peering request")
+	req.Header.Set("Title", title)
 	req.Header.Set("Priority", "default")
-	req.Header.Set("Tags", "satellite")
+	req.Header.Set("Tags", tags)
 	req.Header.Set("Content-Type", "text/plain; charset=utf-8")
 	if a.ntfyToken != "" {
 		req.Header.Set("Authorization", "Bearer "+a.ntfyToken)
@@ -496,6 +653,7 @@ func (a *app) publishNtfy(parent context.Context, body string) error {
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		return fmt.Errorf("ntfy returned HTTP %d", resp.StatusCode)
 	}
+
 	return nil
 }
 

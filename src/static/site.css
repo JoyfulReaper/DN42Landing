@@ -338,3 +338,37 @@ footer {
     grid-column: auto;
   }
 }
+
+.git-item {
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.git-item:first-child {
+  padding-top: 0;
+}
+
+.git-item:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.short-textarea {
+  min-height: 5rem;
+}
+
+.toy-form {
+  margin-top: 1rem;
+}
+
+@media (max-width: 700px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}

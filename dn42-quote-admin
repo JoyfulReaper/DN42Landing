@@ -1,0 +1,282 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DB="${DN42LANDING_DB:-/var/lib/dn42landing/peering.db}"
+
+die()
+{
+    echo "Error: $*" >&2
+    exit 1
+}
+
+require_database()
+{
+    command -v sqlite3 >/dev/null 2>&1 ||
+        die "sqlite3 is not installed."
+
+    [[ -f "$DB" ]] ||
+        die "Database not found: $DB"
+
+    [[ -r "$DB" ]] ||
+        die "Cannot read $DB. Try running with sudo."
+}
+
+valid_id()
+{
+    [[ "${1:-}" =~ ^[0-9]+$ ]]
+}
+
+entry_exists()
+{
+    local id="$1"
+
+    [[ "$(sqlite3 "$DB" \
+        "SELECT EXISTS(SELECT 1 FROM quote_suggestions WHERE id = $id);")" == "1" ]]
+}
+
+list_entries()
+{
+    echo
+    sqlite3 \
+        -header \
+        -column \
+        "$DB" <<'SQL'
+SELECT
+    id,
+    submitted_utc,
+    status,
+    substr(quote_text, 1, 60) AS quote,
+    author
+FROM quote_suggestions
+ORDER BY id DESC;
+SQL
+    echo
+}
+
+list_pending_entries()
+{
+    echo
+    sqlite3 \
+        -header \
+        -column \
+        "$DB" <<'SQL'
+SELECT
+    id,
+    submitted_utc,
+    substr(quote_text, 1, 60) AS quote,
+    author
+FROM quote_suggestions
+WHERE status = 'Pending'
+ORDER BY id ASC;
+SQL
+    echo
+}
+
+show_entry()
+{
+    local id="${1:-}"
+
+    if [[ -z "$id" ]]; then
+        read -rp "Entry ID: " id
+    fi
+
+    valid_id "$id" || {
+        echo "Invalid ID."
+        return
+    }
+
+    if ! entry_exists "$id"; then
+        echo "Entry $id does not exist."
+        return
+    fi
+
+    echo
+    sqlite3 \
+        -header \
+        -line \
+        "$DB" \
+        "SELECT * FROM quote_suggestions WHERE id = $id;"
+    echo
+}
+
+delete_entry()
+{
+    local id
+
+    read -rp "Entry ID to delete: " id
+
+    valid_id "$id" || {
+        echo "Invalid ID."
+        return
+    }
+
+    if ! entry_exists "$id"; then
+        echo "Entry $id does not exist."
+        return
+    fi
+
+    show_entry "$id"
+
+    echo "This permanently deletes entry $id."
+    read -rp "Type DELETE to continue: " confirmation
+
+    if [[ "$confirmation" != "DELETE" ]]; then
+        echo "Cancelled."
+        return
+    fi
+
+    local changed
+
+    changed="$(
+        sqlite3 "$DB" "
+            DELETE FROM quote_suggestions WHERE id = $id;
+            SELECT changes();
+        "
+    )"
+
+    if [[ "$changed" == "1" ]]; then
+        echo "Deleted entry $id."
+    else
+        echo "Nothing deleted."
+    fi
+}
+
+change_status()
+{
+    local id
+    local choice
+    local status
+    local changed
+
+    read -rp "Entry ID: " id
+
+    valid_id "$id" || {
+        echo "Invalid ID."
+        return
+    }
+
+    if ! entry_exists "$id"; then
+        echo "Entry $id does not exist."
+        return
+    fi
+
+    show_entry "$id"
+
+    echo "New status:"
+    echo "1) Pending"
+    echo "2) Approved"
+    echo "3) Added"
+    echo "4) Rejected"
+    echo
+
+    read -rp "Choice: " choice
+
+    case "$choice" in
+        1)
+            status="Pending"
+            ;;
+        2)
+            status="Approved"
+            ;;
+        3)
+            status="Added"
+            ;;
+        4)
+            status="Rejected"
+            ;;
+        *)
+            echo "Cancelled."
+            return
+            ;;
+    esac
+
+    changed="$(
+        sqlite3 "$DB" "
+            UPDATE quote_suggestions
+            SET status = '$status'
+            WHERE id = $id;
+            SELECT changes();
+        "
+    )"
+
+    if [[ "$changed" == "1" ]]; then
+        echo "Entry $id status changed to $status."
+    else
+        echo "Nothing changed."
+    fi
+}
+
+export_entry()
+{
+    local id="${1:-}"
+
+    if [[ -z "$id" ]]; then
+        read -rp "Entry ID: " id
+    fi
+
+    valid_id "$id" || {
+        echo "Invalid ID."
+        return
+    }
+
+    if ! entry_exists "$id"; then
+        echo "Entry $id does not exist."
+        return
+    fi
+
+    echo
+    sqlite3 \
+        -json \
+        "$DB" \
+        "SELECT quote_text AS text, author, source FROM quote_suggestions WHERE id = $id;"
+    echo
+}
+
+main_menu()
+{
+    while true; do
+        echo
+        echo "DN42 Quote Suggestion Admin"
+        echo "==========================="
+        echo "1) Show entries"
+        echo "2) Show pending entries"
+        echo "3) Show full entry"
+        echo "4) Delete entry"
+        echo "5) Change status"
+        echo "6) Export HappyQOTD JSON"
+        echo "7) Quit"
+        echo
+
+        read -rp "Choice: " choice
+
+        case "$choice" in
+            1)
+                list_entries
+                ;;
+            2)
+                list_pending_entries
+                ;;
+            3)
+                show_entry
+                ;;
+            4)
+                delete_entry
+                ;;
+            5)
+                change_status
+                ;;
+            6)
+                export_entry
+                ;;
+            7|q|Q)
+                exit 0
+                ;;
+            *)
+                echo "Unknown choice."
+                ;;
+        esac
+    done
+}
+
+require_database
+main_menu

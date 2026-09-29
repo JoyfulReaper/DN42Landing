@@ -126,40 +126,57 @@ async function loadRecentGit() {
       throw new Error("No Git activity returned");
     }
 
-    const commit = activity[0];
+    const fragment = document.createDocumentFragment();
 
-    const sha = typeof commit.sha === "string"
-      ? commit.sha.slice(0, 7)
-      : "unknown";
+    for (const commit of activity) {
+      const item = document.createElement("div");
+      item.className = "git-item";
 
-    const repository = commit.repository || "unknown repository";
-    const branch = commit.branch || "unknown branch";
-    const message = commit.message || "(no commit message)";
-    const author = commit.author || commit.authorUsername || "Unknown author";
+      const sha =
+        typeof commit.sha === "string"
+          ? commit.sha.slice(0, 7)
+          : "unknown";
 
-    const header = textElement(
-      "div",
-      `${sha} [${repository}:${branch}]`,
-      "toy-code"
-    );
+      const repository =
+        commit.repository || "unknown repository";
 
-    const messageElement = textElement(
-      "div",
-      message,
-      "toy-commit-message"
-    );
+      const branch =
+        commit.branch || "unknown branch";
 
-    const metadata = textElement(
-      "div",
-      `${author}${commit.timestamp ? ` · ${commit.timestamp}` : ""}`,
-      "toy-meta"
-    );
+      const message =
+        commit.message || "(no commit message)";
 
-    container.replaceChildren(
-      header,
-      messageElement,
-      metadata
-    );
+      const author =
+        commit.author ||
+        commit.authorUsername ||
+        "Unknown author";
+
+      item.append(
+        textElement(
+          "div",
+          `${sha} [${repository}:${branch}]`,
+          "toy-code"
+        ),
+        textElement(
+          "div",
+          message,
+          "toy-commit-message"
+        ),
+        textElement(
+          "div",
+          `${author}${
+            commit.timestamp
+              ? ` · ${commit.timestamp}`
+              : ""
+          }`,
+          "toy-meta"
+        )
+      );
+
+      fragment.append(item);
+    }
+
+    container.replaceChildren(fragment);
   } catch (error) {
     console.error("Git activity:", error);
 

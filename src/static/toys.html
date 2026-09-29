@@ -63,6 +63,41 @@
       <p class="status coming-soon">Sensor feed not yet
       connected.</p>
     </section>
+    <section class="card toy-card toy-wide">
+      <div class="toy-heading">
+        <h2>Suggest a Quote</h2><span class=
+        "toy-service">HAPPYQOTD</span>
+      </div>
+      <p class="muted">Suggest something for the quote collection.
+      Submissions are reviewed manually.</p>
+      <form class="toy-form" method="post" action=
+      "/toys/quotes/suggest">
+        <label for="quote_text">Quote</label> 
+        <textarea id="quote_text" name="quote_text" maxlength=
+        "1000" required="" placeholder=
+        "Readable code is a favor you leave for your future self."></textarea>
+        <div class="form-grid">
+          <div>
+            <label for="quote_author">Author</label> <input id=
+            "quote_author" name="quote_author" maxlength="200"
+            placeholder="Optional">
+          </div>
+          <div>
+            <label for="quote_source">Source</label> <input id=
+            "quote_source" name="quote_source" maxlength="300"
+            placeholder="Optional">
+          </div>
+        </div><label for="quote_notes">Notes</label> 
+        <textarea id="quote_notes" name="quote_notes" maxlength=
+        "500" class="short-textarea" placeholder=
+        "Why this belongs in the collection, context, etc."></textarea>
+        <div class="honeypot" aria-hidden="true">
+          <label for="quote_website">Website</label> <input id=
+          "quote_website" name="quote_website" tabindex="-1"
+          autocomplete="off">
+        </div><button type="submit">Suggest quote</button>
+      </form>
+    </section>
   </div>
   <footer>
     AS4242420425 · DN42 · toys may be removed, rewritten, or made
