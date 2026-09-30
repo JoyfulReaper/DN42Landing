@@ -62,7 +62,7 @@
         <dt>Validation</dt>
         <dd>DN42 ROA validation</dd>
         <dt>Transit</dt>
-        <dd>Controlled full-table transit configured for Baragoon and iEdon</dd>
+        <dd>Controlled full-table transit configured for Baragoon, iEdon, and Kioubit</dd>
       </dl>
     </section>
   </div>
@@ -76,28 +76,33 @@
   <strong>hbg1</strong>, is now online as a residential FreeBSD POP
   in Harrisburg, PA. Peering requests are accepted for all three
   nodes.</p>
-  <p>Clanker and ScopeCreep exchange routes over their existing
-  WireGuard/iBGP core. hbg1 currently has a native-IPv6 WireGuard
-  core to Clanker and runs one IPv6 MP-BGP session carrying both
-  IPv4 and IPv6 NLRI. IPv4 uses RFC 8950 Extended Next Hop, so
-  hbg1 installs DN42 IPv4 routes with an IPv6 next hop. A direct
-  hbg1-to-ScopeCreep core leg is planned to complete the
-  three-router iBGP mesh.</p>
-  <p>Clanker currently provides controlled full-table IPv4 and IPv6
-  transit to Baragoon using dedicated alternate routing tables
+  <p>Clanker, ScopeCreep, and hbg1 now form a full three-router
+  iBGP mesh over dedicated WireGuard core links. hbg1 uses native
+  residential IPv6 as the underlay for both core tunnels and runs
+  IPv6 MP-BGP sessions carrying both IPv4 and IPv6 NLRI. IPv4 uses
+  RFC 8950 Extended Next Hop. Failover was tested by disabling the
+  hbg1-to-Clanker BGP session; hbg1 retained its DN42 routes through
+  ScopeCreep and both sessions returned to Established afterward.</p>
+  <p>Clanker provides controlled full-table IPv4 and IPv6 transit
+  to Baragoon using dedicated alternate routing tables
   (<code>baragoon_transit4</code> and
   <code>baragoon_transit6</code>) and Linux policy routing table
-  <code>1732</code>. Traffic for my own prefixes bypasses the
-  transit policy, and routes learned directly from Baragoon are
-  excluded from the return transit view to avoid hairpinning traffic
-  back to the same peer. The Baragoon peering interface is
-  rate-limited to 50 Mbps in both directions. The policy is live,
-  although no real third-party transit packet has yet been observed.</p>
-  <p>ScopeCreep provides full-table IPv4 and IPv6 transit to iEdon
-  using a dedicated alternate-route policy view with equivalent
-  anti-hairpin behavior. The iEdon peering interface is also
-  rate-limited to 50 Mbps in both directions. Transit is experimental,
-  has no SLA, and should not be treated as guaranteed infrastructure.</p>
+  <code>1732</code>. Third-party routes learned from Baragoon are
+  excluded from its return transit view, while Baragoon's directly
+  originated prefixes remain directly reachable. BIRD sorted tables
+  plus <code>secondary on</code> allow valid alternate paths to be
+  advertised when the selected best route came from Baragoon. The
+  peering interface is capped at 50 Mbps in both directions.</p>
+  <p>ScopeCreep provides the same controlled full-table transit model
+  to iEdon and Kioubit using dedicated alternate-route views and
+  Linux policy routing tables <code>2190</code> and
+  <code>2191</code>. Both transit peer interfaces are capped at
+  50 Mbps in each direction. Third-party routes learned from the
+  ingress peer are excluded from that peer's return view, while
+  directly originated prefixes remain direct. Actual third-party
+  forwarding has been observed from iEdon through Kioubit. Transit
+  is experimental, has no SLA, and should not be treated as
+  guaranteed infrastructure.</p>
   <p class="muted">This is a hobby network. There is no SLA and no
   uptime guarantee.</p>
 
@@ -124,8 +129,10 @@
     IPv4 next hops. hbg1 receives a filtered DN42 table from
     Clanker and currently originates only its own router host
     identities internally.</li>
-    <li><strong>hbg1 ↔ ScopeCreep</strong> — planned direct core
-    tunnel/session to complete the three-router iBGP mesh.</li>
+    <li><strong>hbg1 ↔ ScopeCreep</strong> — direct WireGuard core
+    over native residential IPv6 with IPv6 MP-BGP/RFC 8950. This
+    completes the three-router full mesh and gives hbg1 an alternate
+    internal route feed when its Clanker session is unavailable.</li>
   </ul>
   <h2>Current peers</h2>
   <table>
@@ -177,8 +184,7 @@
         <td><code>AS4242423914</code></td>
         <td>Los Angeles, CA</td>
         <td>ScopeCreep</td>
-        <td>Valid routes in; own prefixes out; eligible alternate
-        path for iEdon transit</td>
+        <td>Full table / controlled transit; 50 Mbps cap</td>
         <td class="status-up">Established</td>
       </tr>
       <tr>
@@ -192,13 +198,15 @@
       </tr>
     </tbody>
   </table>
-  <p class="muted">Clanker's Baragoon transit view excludes routes
-  learned directly from Baragoon and uses alternate paths learned
-  from other peers or over the ScopeCreep core. ScopeCreep's iEdon
-  transit view similarly excludes routes learned directly from iEdon
-  and may instead select routes learned from Kioubit, MOE233, or
-  over the Clanker core. Other external sessions remain
-  own-prefix-only exports unless explicitly configured otherwise.</p>
+  <p class="muted">For controlled-transit peers, third-party routes
+  learned from the ingress peer are excluded from that peer's return
+  routing view, while directly originated prefixes remain reachable
+  over the direct session. BIRD sorted tables and
+  <code>secondary on</code> provide alternate export paths where
+  available. ScopeCreep may forward transit through iEdon, Kioubit,
+  MOE233, or the Clanker core according to its alternate routing
+  views. Other external sessions remain own-prefix-only exports
+  unless explicitly configured otherwise.</p>
   <h2>Services</h2>
   <ul>
     <li>
