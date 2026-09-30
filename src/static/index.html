@@ -15,7 +15,7 @@
   <header>
     <h1>AS4242420425</h1>
     <p class="lede">JoyfulReaper / kgivler on DN42 — multi-edge
-    hobby network</p>
+    hobby network with a residential FreeBSD POP</p>
   </header>
   <div class="grid">
     <section class="card">
@@ -31,6 +31,8 @@
         <dd>New York, NY</dd>
         <dt>ScopeCreep edge</dt>
         <dd>Phoenix, AZ</dd>
+        <dt>hbg1 residential POP</dt>
+        <dd>Harrisburg, PA · FreeBSD · 200 Mbps residential</dd>
         <dt>Routing</dt>
         <dd>BIRD 2 / internal iBGP core</dd>
       </dl>
@@ -56,7 +58,7 @@
         <dt>Transport</dt>
         <dd>WireGuard</dd>
         <dt>BGP</dt>
-        <dd>MP-BGP / IPv6 link-local</dd>
+        <dd>MP-BGP / IPv6 / RFC 8950 internally</dd>
         <dt>Validation</dt>
         <dd>DN42 ROA validation</dd>
         <dt>Transit</dt>
@@ -69,10 +71,18 @@
   services, old protocols, and whatever else seems interesting
   enough to put on the fake Internet.</p>
   <p><strong>AS4242420425 is a multi-edge hobby network
-  experimenting with controlled transit.</strong> I accept DN42
-  routes from external peers on both Clanker and ScopeCreep. The
-  two edge routers exchange routes over a dedicated WireGuard core
-  using IPv4 and IPv6 iBGP.</p>
+  experimenting with controlled transit.</strong> Clanker and
+  ScopeCreep are the two public VPS edges. A third router,
+  <strong>hbg1</strong>, is now online as a residential FreeBSD POP
+  in Harrisburg, PA. Peering requests are accepted for all three
+  nodes.</p>
+  <p>Clanker and ScopeCreep exchange routes over their existing
+  WireGuard/iBGP core. hbg1 currently has a native-IPv6 WireGuard
+  core to Clanker and runs one IPv6 MP-BGP session carrying both
+  IPv4 and IPv6 NLRI. IPv4 uses RFC 8950 Extended Next Hop, so
+  hbg1 installs DN42 IPv4 routes with an IPv6 next hop. A direct
+  hbg1-to-ScopeCreep core leg is planned to complete the
+  three-router iBGP mesh.</p>
   <p>Clanker currently provides controlled full-table IPv4 and IPv6
   transit to Baragoon using dedicated alternate routing tables
   (<code>baragoon_transit4</code> and
@@ -90,6 +100,18 @@
   has no SLA, and should not be treated as guaranteed infrastructure.</p>
   <p class="muted">This is a hobby network. There is no SLA and no
   uptime guarantee.</p>
+  <h2>Internal topology</h2>
+  <ul>
+    <li><strong>Clanker ↔ ScopeCreep</strong> — dedicated WireGuard
+    core with internal IPv4/IPv6 BGP.</li>
+    <li><strong>Clanker ↔ hbg1</strong> — WireGuard over native
+    residential IPv6, one IPv6 MP-BGP session, and RFC 8950 for
+    IPv4 next hops. hbg1 receives a filtered DN42 table from
+    Clanker and currently originates only its own router host
+    identities internally.</li>
+    <li><strong>hbg1 ↔ ScopeCreep</strong> — planned direct core
+    tunnel/session to complete the three-router iBGP mesh.</li>
+  </ul>
   <h2>Current peers</h2>
   <table>
     <thead>
@@ -212,6 +234,12 @@
   <p>Please have valid DN42 registry objects and ROAs. Low-latency
   North American peers are especially welcome, but they are not a
   hard requirement.</p>
+  <p><strong>hbg1 peering:</strong> hbg1 is a residential FreeBSD
+  POP on a 200 Mbps home connection. Peering there is intentionally
+  small and experimental: each external peer will be capped at
+  5 Mbps in each direction. hbg1 does not offer general transit by
+  default, and the residential connection carries no SLA or uptime
+  promise.</p>
   <p>I generate a <strong>fresh WireGuard keypair per approved
   peer</strong>. There is intentionally no single public WireGuard
   key shown here. After I approve a request, I create the
@@ -220,7 +248,8 @@
   <h3>What to send</h3>
   <ul>
     <li>which node you would like to peer with: Clanker (New York,
-    NY) or ScopeCreep (Phoenix, AZ)</li>
+    NY), ScopeCreep (Phoenix, AZ), or hbg1 (Harrisburg, PA,
+    residential; 5 Mbps per-direction peer cap)</li>
     <li>your ASN and network name</li>
     <li>a contact method</li>
     <li>your public WireGuard endpoint</li>
@@ -263,7 +292,7 @@
     "{{.Form.LinkLocalPreference}}"> <label for=
     "notes">Notes</label> 
     <textarea id="notes" name="notes" placeholder=
-    "Preferred edge (Clanker/New York or ScopeCreep/Phoenix), BGP capabilities, routing policy, weirdness, etc.">
+    "Preferred edge (Clanker/New York, ScopeCreep/Phoenix, or hbg1/Harrisburg residential), BGP capabilities, routing policy, weirdness, etc.">
 
     {{.Form.Notes}}</textarea>
     <div class="honeypot" aria-hidden="true">

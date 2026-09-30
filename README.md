@@ -17,11 +17,16 @@ The project is intentionally boring:
 - ASN: `AS4242420425`
 - IPv4 prefix: `172.20.220.48/28`
 - IPv6 prefix: `fdf0:e12c:5528::/48`
-- Edge routers: Clanker and ScopeCreep
+- Public peering edges: Clanker and ScopeCreep
+- Residential POP: hbg1 (FreeBSD 15.1, Harrisburg, PA)
 - Routing daemon: BIRD 2
-- Internal routing: IPv4/IPv6 iBGP over a dedicated WireGuard core
+- Internal routing:
+  - Clanker ↔ ScopeCreep: dedicated WireGuard core with internal IPv4/IPv6 BGP
+  - Clanker ↔ hbg1: WireGuard over native IPv6 with one IPv6 MP-BGP session
+  - IPv4 NLRI on the Clanker ↔ hbg1 session uses RFC 8950 Extended Next Hop
+  - direct hbg1 ↔ ScopeCreep core is planned to complete the three-router iBGP mesh
 - Peering transport: WireGuard
-- BGP: MP-BGP over IPv6 link-local, Extended Next Hop where supported
+- External BGP: MP-BGP over IPv6 link-local where supported
 - Route validation: DN42 ROA validation
 
 Shared web-service ingress:
@@ -62,6 +67,22 @@ both directions.
 
 Transit is experimental. This is a hobby network; no SLA or uptime guarantee
 is provided.
+
+### Residential POP / hbg1
+
+hbg1 is a FreeBSD 15.1 residential POP in Harrisburg, PA. Its DN42 router
+identities are `172.20.220.53/32` and `fdf0:e12c:5528::53/128`.
+
+Its current internal core to Clanker runs WireGuard over native residential
+IPv6. One IPv6 iBGP session carries both IPv4 and IPv6 routes; IPv4 uses RFC
+8950 Extended Next Hop. The direct hbg1 ↔ ScopeCreep core leg is still planned,
+so the three-router internal topology is not yet a full iBGP mesh.
+
+Manual external peering requests are accepted for hbg1. Because it sits on a
+200 Mbps residential connection, each hbg1 external peer will be capped at
+5 Mbps in each direction. hbg1 peering is best-effort/experimental and does not
+include general transit by default. Endpoint details are supplied after manual
+approval rather than publishing a residential address here.
 
 A fresh WireGuard keypair is generated for each approved peer. There is no
 single public WireGuard key because peer-specific keys make rotation and
