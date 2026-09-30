@@ -17,7 +17,7 @@
 }
 
 body {
-  max-width: 980px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 2.5rem 1rem 5rem;
   background: var(--bg);
@@ -73,9 +73,13 @@ code {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.8rem;
   margin: 1.2rem 0;
+}
+
+.network-card {
+  grid-column: 1 / -1;
 }
 
 .card {
@@ -238,6 +242,15 @@ footer {
   td {
     padding: 0.45rem;
   }
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .network-card {
+    grid-column: auto;
+  }
+
+
 }
 
 .toy-output {
