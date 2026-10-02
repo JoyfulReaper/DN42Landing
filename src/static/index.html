@@ -66,6 +66,34 @@
       </dl>
     </section>
   </div>
+
+  <h2>Live from the network</h2>
+  <div class="grid toys-grid">
+    <section class="card toy-card">
+      <div class="toy-heading">
+        <h2>Quote of the Day</h2>
+        <span class="toy-service">HAPPYQOTD</span>
+      </div>
+      <div id="qotd" class="toy-output">
+        <span class="muted">Fetching today's questionable wisdom...</span>
+      </div>
+      <p class="muted">
+        <a href="https://qotd.kgivler.dn42/api/quotes/today">HTTP API</a>
+        · classic QOTD: <code>qotd.kgivler.dn42:17</code>
+      </p>
+    </section>
+
+    <section class="card toy-card">
+      <div class="toy-heading">
+        <h2>Recent Git Commits</h2>
+        <span class="toy-service">MISSION CONTROL</span>
+      </div>
+      <div id="recent-git" class="toy-output">
+        <span class="muted">Consulting the commit crimes...</span>
+      </div>
+    </section>
+  </div>
+
   <h2>About</h2>
   <p>This is my little corner of DN42: routing experiments, weird
   services, old protocols, and whatever else seems interesting
@@ -129,6 +157,14 @@
     <li>
       <strong>IT-Tools</strong> — <a href=
       "https://tools.joyfulreaper.dn42/">tools.joyfulreaper.dn42</a>
+    </li>
+    <li>
+      <strong>HappyQOTD</strong> —
+      <a href="https://qotd.kgivler.dn42/">HTTP API</a>
+      (<a href="https://qotd.kgivler.dn42/api/quotes/today">today's quote</a>);
+      classic Quote of the Day on
+      <code>qotd.kgivler.dn42:17</code>
+      (<code>nc qotd.kgivler.dn42 17</code>; TCP/UDP port 17)
     </li>
     <li>
       <strong>HappyGopher</strong> — <a href=
@@ -340,5 +376,6 @@
        target="_blank"
        rel="sponsored noopener noreferrer">GreenCloud VPS</a>
   </footer>
+  <script src="/toys.js"></script>
 </body>
 </html>
