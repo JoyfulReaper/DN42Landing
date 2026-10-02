@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"embed"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"html/template"
@@ -163,6 +164,22 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
+
+	mux.HandleFunc("GET /whoami", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		w.Header().Set("Cache-Control", "no-store")
+		_, _ = io.WriteString(w, requestRemoteHost(r)+"\n")
+	})
+
+	mux.HandleFunc("GET /api/whoami", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.Header().Set("Cache-Control", "no-store")
+
+		_ = json.NewEncoder(w).Encode(map[string]string{
+			"address": requestRemoteHost(r),
+			"network": "dn42",
+		})
+	})
 
 	mux.HandleFunc("GET /site.css", func(w http.ResponseWriter, r *http.Request) {
 		css, err := staticFS.ReadFile("static/site.css")
@@ -680,14 +697,16 @@ func requestLogging(next http.Handler) http.Handler {
 			go publishMissionControlVisit(payload)
 		}
 
-		log.Printf(
-			"%s %s remote=%s ua=%q duration=%s",
-			r.Method,
-			r.URL.Path,
-			requestRemoteHost(r),
-			r.UserAgent(),
-			time.Since(start).Round(time.Millisecond),
-		)
+		if r.URL.Path != "/whoami" && r.URL.Path != "/api/whoami" {
+			log.Printf(
+				"%s %s remote=%s ua=%q duration=%s",
+				r.Method,
+				r.URL.Path,
+				requestRemoteHost(r),
+				r.UserAgent(),
+				time.Since(start).Round(time.Millisecond),
+			)
+		}
 	})
 }
 

@@ -142,7 +142,12 @@ async function loadRecentGit() {
 
     const fragment = document.createDocumentFragment();
 
-    for (const commit of activity) {
+    const requestedLimit = Number.parseInt(container.dataset.limit || "", 10);
+    const commits = Number.isFinite(requestedLimit)
+      ? activity.slice(0, requestedLimit)
+      : activity;
+
+    for (const commit of commits) {
       const item = document.createElement("div");
       item.className = "git-item";
 
@@ -280,6 +285,46 @@ async function loadWorkstation() {
   }
 }
 
+async function loadWhoami() {
+  const container = document.getElementById("whoami");
+  if (!container) return;
+
+  try {
+    const response = await fetch("/api/whoami", {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const result = await response.json();
+
+    container.replaceChildren(
+      textElement(
+        "div",
+        result.address || "Unknown address",
+        "toy-code"
+      ),
+      textElement(
+        "div",
+        "Observed by this DN42 service",
+        "toy-meta"
+      )
+    );
+  } catch (error) {
+    console.error("Whoami:", error);
+
+    container.replaceChildren(
+      textElement(
+        "span",
+        "Address lookup is temporarily unavailable.",
+        "warning"
+      )
+    );
+  }
+}
+
 document
   .getElementById("workstation-refresh")
   ?.addEventListener("click", () => {
@@ -296,3 +341,4 @@ void loadWorkstation();
 void loadRandomQuote();
 void loadQotd();
 void loadRecentGit();
+void loadWhoami();
