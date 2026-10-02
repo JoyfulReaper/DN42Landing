@@ -75,7 +75,8 @@
   ScopeCreep are the two public VPS edges. A third router,
   <strong>hbg1</strong>, is now online as a residential FreeBSD POP
   in Harrisburg, PA. Peering requests are accepted for all three
-  nodes.</p>
+  nodes; hbg1 external peers must have a publicly reachable IPv6
+  WireGuard endpoint.</p>
   <p>Clanker, ScopeCreep, and hbg1 now form a full three-router
   iBGP mesh over dedicated WireGuard core links. hbg1 uses native
   residential IPv6 as the underlay for both core tunnels and runs
@@ -260,8 +261,11 @@
   <p><strong>hbg1 peering:</strong> hbg1 is a residential FreeBSD
   POP on a 200 Mbps home connection. Peering there is intentionally
   small and experimental: each external peer will be capped at
-  5 Mbps in each direction. hbg1 does not offer general transit by
-  default, and the residential connection carries no SLA or uptime
+  5 Mbps in each direction. hbg1 accepts IPv6-underlay peers only:
+  your WireGuard endpoint must be publicly reachable over IPv6.
+  This does not mean IPv6 routes only; the MP-BGP session can carry
+  both IPv4 and IPv6 DN42 NLRI. hbg1 does not offer general transit
+  by default, and the residential connection carries no SLA or uptime
   promise.</p>
   <p>I generate a <strong>fresh WireGuard keypair per approved
   peer</strong>. There is intentionally no single public WireGuard
@@ -272,7 +276,8 @@
   <ul>
     <li>which node you would like to peer with: Clanker (New York,
     NY), ScopeCreep (Phoenix, AZ), or hbg1 (Harrisburg, PA,
-    residential; 5 Mbps per-direction peer cap)</li>
+    residential; IPv6 WireGuard endpoint required; 5 Mbps
+    per-direction peer cap)</li>
     <li>your ASN and network name</li>
     <li>a contact method</li>
     <li>your public WireGuard endpoint</li>
