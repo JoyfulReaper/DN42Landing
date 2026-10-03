@@ -17,55 +17,47 @@
     <p class="lede">JoyfulReaper / kgivler on DN42 — multi-edge
     hobby network with a residential FreeBSD POP</p>
   </header>
-  <div class="grid">
-    <section class="card network-card">
-      <h3>Network</h3>
-      <dl>
-        <dt>ASN</dt>
-        <dd><code>AS4242420425</code></dd>
-        <dt>IPv4</dt>
-        <dd><code>172.20.220.48/28</code></dd>
-        <dt>IPv6</dt>
-        <dd><code>fdf0:e12c:5528::/48</code></dd>
-        <dt>Clanker edge</dt>
-        <dd>New York, NY</dd>
-        <dt>ScopeCreep edge</dt>
-        <dd>Phoenix, AZ</dd>
-        <dt>hbg1 residential POP</dt>
-        <dd>Harrisburg, PA · FreeBSD · 200 Mbps residential</dd>
-        <dt>Routing</dt>
-        <dd>BIRD 2 / internal iBGP core</dd>
-      </dl>
-    </section>
-    <section class="card">
-      <h3>Landing service</h3>
-      <dl>
-        <dt>IPv4</dt>
-        <dd><code>172.20.220.50</code></dd>
-        <dt>IPv6</dt>
-        <dd><code>fdf0:e12c:5528::50</code></dd>
-        <dt>DNS</dt>
-        <dd><code>joyfulreaper.dn42</code></dd>
-        <dt>HTTPS</dt>
-        <dd>Available via DN42 CA / Burble ACME</dd>
-      </dl>
-    </section>
-    <section class="card">
-      <h3>Routing policy</h3>
-      <dl>
-        <dt>Peering</dt>
-        <dd>Open, manual approval</dd>
-        <dt>Transport</dt>
-        <dd>WireGuard</dd>
-        <dt>BGP</dt>
-        <dd>MP-BGP / IPv6 / RFC 8950 internally</dd>
-        <dt>Validation</dt>
-        <dd>DN42 ROA validation</dd>
-        <dt>Transit</dt>
-        <dd>Controlled full-table transit configured for Baragoon, iEdon, and Kioubit</dd>
-      </dl>
-    </section>
-  </div>
+  <h2>About</h2>
+  <p>
+    This is my little corner of DN42: routing experiments, weird services,
+    old protocols, and whatever else seems interesting enough to put on the
+    fake Internet.
+  </p>
+
+  <p class="muted">
+    AS4242420425 is a multi-edge hobby network with public VPS edges and a
+    residential FreeBSD POP. No SLA, just networking experiments and things
+    I find interesting.
+  </p>
+
+  <section class="card network-card">
+    <h3>Network</h3>
+    <dl>
+      <dt>ASN</dt>
+      <dd><code>AS4242420425</code></dd>
+
+      <dt>IPv4</dt>
+      <dd><code>172.20.220.48/28</code></dd>
+
+      <dt>IPv6</dt>
+      <dd><code>fdf0:e12c:5528::/48</code></dd>
+
+      <dt>Edges</dt>
+      <dd>New York · Phoenix · Harrisburg</dd>
+
+      <dt>Landing</dt>
+      <dd><code>joyfulreaper.dn42</code></dd>
+
+      <dt>Routing</dt>
+      <dd>BIRD 2 · internal iBGP core</dd>
+
+      <dt>Peering</dt>
+      <dd>Open · manual approval · WireGuard</dd>
+
+      <dt>Transit</dt>
+      <dd>Experimental controlled full-table transit</dd>
+    </dl>
+  </section>
 
   <h2>Live from the network</h2>
   <div class="grid toys-grid">
@@ -74,9 +66,11 @@
         <h2>Quote of the Day</h2>
         <span class="toy-service">HAPPYQOTD</span>
       </div>
+
       <div id="qotd" class="toy-output">
         <span class="muted">Fetching today's questionable wisdom...</span>
       </div>
+
       <p class="muted">
         <a href="https://qotd.kgivler.dn42/api/quotes/today">HTTP API</a>
         · classic QOTD: <code>qotd.kgivler.dn42:17</code>
@@ -88,52 +82,33 @@
         <h2>Recent Git Commits</h2>
         <span class="toy-service">MISSION CONTROL</span>
       </div>
-      <div id="recent-git" class="toy-output">
+
+      <div id="recent-git" class="toy-output" data-limit="2">
         <span class="muted">Consulting the commit crimes...</span>
       </div>
     </section>
   </div>
 
-  <h2>About</h2>
-  <p>This is my little corner of DN42: routing experiments, weird
-  services, old protocols, and whatever else seems interesting
-  enough to put on the fake Internet.</p>
-  <p><strong>AS4242420425 is a multi-edge hobby network
-  experimenting with controlled transit.</strong> Clanker and
-  ScopeCreep are the two public VPS edges. A third router,
-  <strong>hbg1</strong>, is now online as a residential FreeBSD POP
-  in Harrisburg, PA. Peering requests are accepted for all three
-  nodes; hbg1 external peers must have a publicly reachable IPv6
-  WireGuard endpoint.</p>
-  <p>Clanker, ScopeCreep, and hbg1 now form a full three-router
-  iBGP mesh over dedicated WireGuard core links. hbg1 uses native
-  residential IPv6 as the underlay for both core tunnels and runs
-  IPv6 MP-BGP sessions carrying both IPv4 and IPv6 NLRI. IPv4 uses
-  RFC 8950 Extended Next Hop. Failover was tested by disabling the
-  hbg1-to-Clanker BGP session; hbg1 retained its DN42 routes through
-  ScopeCreep and both sessions returned to Established afterward.</p>
-  <p>Clanker provides controlled full-table IPv4 and IPv6 transit
-  to Baragoon using dedicated alternate routing tables
-  (<code>baragoon_transit4</code> and
-  <code>baragoon_transit6</code>) and Linux policy routing table
-  <code>1732</code>. Third-party routes learned from Baragoon are
-  excluded from its return transit view, while Baragoon's directly
-  originated prefixes remain directly reachable. BIRD sorted tables
-  plus <code>secondary on</code> allow valid alternate paths to be
-  advertised when the selected best route came from Baragoon. The
-  peering interface is capped at 50 Mbps in both directions.</p>
-  <p>ScopeCreep provides the same controlled full-table transit model
-  to iEdon and Kioubit using dedicated alternate-route views and
-  Linux policy routing tables <code>2190</code> and
-  <code>2191</code>. Both transit peer interfaces are capped at
-  50 Mbps in each direction. Third-party routes learned from the
-  ingress peer are excluded from that peer's return view, while
-  directly originated prefixes remain direct. Actual third-party
-  forwarding has been observed from iEdon through Kioubit. Transit
-  is experimental, has no SLA, and should not be treated as
-  guaranteed infrastructure.</p>
-  <p class="muted">This is a hobby network. There is no SLA and no
-  uptime guarantee.</p>
+  <h2>Network details</h2>
+
+  <p>
+    Clanker and ScopeCreep are the two public VPS edges. A third router,
+    <strong>hbg1</strong>, runs as a residential FreeBSD POP in Harrisburg,
+    PA. The three routers form an internal iBGP mesh over dedicated WireGuard
+    links.
+  </p>
+
+  <p>
+    Clanker provides controlled full-table IPv4 and IPv6 transit to Baragoon.
+    ScopeCreep provides the same experimental model to iEdon and Kioubit.
+    Transit paths use dedicated alternate routing tables, policy routing, and
+    bounded interface rates.
+  </p>
+
+  <p class="muted">
+    Detailed topology, peers, routing policy, and peering requirements are
+    documented below.
+  </p>
 
   <h2>Services</h2>
   <ul>
@@ -170,6 +145,11 @@
       <strong>HappyGopher</strong> — <a href=
       "gopher://gopher.kgivler.dn42/">gopher.kgivler.dn42</a>
       (IPv6-only)
+    </li>
+    <li>
+      <strong>HappyGemini</strong> —
+      <a href="gemini://gemini.kgivler.dn42/">gemini.kgivler.dn42</a>
+      (<code>fdf0:e12c:5528::90</code>, Gemini/TLS on TCP/1965)
     </li>
     <li>
       <strong>Network Toys</strong> — <a href=
