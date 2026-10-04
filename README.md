@@ -52,14 +52,15 @@ Clanker and ScopeCreep. Most external sessions remain own-prefix-only exports
 unless explicitly configured otherwise.
 
 Clanker currently provides controlled full-table IPv4 and IPv6 transit to
-Baragoon (`AS4242421732`). The transit policy uses dedicated BIRD alternate
-tables (`baragoon_transit4` and `baragoon_transit6`) together with Linux policy
-routing table `1732`. Traffic to AS4242420425's own prefixes bypasses the
-transit policy, and routes learned directly from Baragoon are excluded from
-the return transit view to prevent hairpinning traffic back to the same peer.
-The Baragoon peering interface is rate-limited to 50 Mbps in both directions.
-The policy is live, although no real third-party transit packet has yet been
-observed.
+Baragoon (`AS4242421732`) and RoutedBits (`AS4242420207`). Each peer uses
+dedicated BIRD alternate routing tables together with a dedicated Linux policy
+routing table: `baragoon_transit4` / `baragoon_transit6` with table `1732`,
+and `routedbits_transit4` / `routedbits_transit6` with table `2207`. Traffic
+to AS4242420425's own prefixes bypasses the transit policy, while third-party
+routes learned from the ingress peer are excluded from that peer's return
+transit view to prevent hairpinning. Directly originated peer prefixes remain
+reachable over the direct session. Both peering interfaces are rate-limited
+to 50 Mbps in each direction.
 
 ScopeCreep also provides controlled full-table IPv4 and IPv6 transit to iEdon
 (`AS4242422189`) using a dedicated alternate-route policy view with equivalent
