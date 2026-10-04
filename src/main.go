@@ -34,7 +34,7 @@ const (
 
 	defaultQOTDURL       = "https://qotd.kgivler.dn42/api/quotes/today"
 	defaultRandomQOTDURL = "https://qotd.kgivler.dn42/api/quotes/random"
-	defaultGitURL        = "https://api.kgivler.dn42/api/github/activity?limit=5"
+	defaultGitURL        = "https://api.kgivler.dn42/api/github/activity?limit=4"
 	defaultStatusURL     = "https://api.kgivler.dn42/api/system/status"
 )
 
