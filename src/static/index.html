@@ -101,8 +101,10 @@
   <p>
     Clanker provides controlled full-table IPv4 and IPv6 transit to Baragoon
     and RoutedBits. ScopeCreep provides the same experimental model to iEdon
-    and Kioubit. Transit paths use dedicated alternate routing tables, policy
-    routing, and bounded interface rates.
+    and Kioubit. hbg1 also has an external eBGP session with PuduNet NY01,
+    using own-prefix-only export and a 5 Mbps cap in each direction.
+    Transit paths use dedicated alternate routing tables, policy routing,
+    and bounded interface rates.
   </p>
 
   <p class="muted">
@@ -266,6 +268,14 @@
         path for iEdon transit</td>
         <td class="status-up">Established</td>
       </tr>
+      <tr>
+        <td>PuduNet</td>
+        <td><code>AS4242422227</code></td>
+        <td>New York, NY</td>
+        <td>hbg1</td>
+        <td>Valid routes in; own prefixes out; no transit; 5 Mbps cap</td>
+        <td class="status-up">Established</td>
+      </tr>
     </tbody>
   </table>
   <p class="muted">For controlled-transit peers, third-party routes
@@ -275,8 +285,8 @@
   <code>secondary on</code> provide alternate export paths where
   available. ScopeCreep may forward transit through iEdon, Kioubit,
   MOE233, or the Clanker core according to its alternate routing
-  views. Other external sessions remain own-prefix-only exports
-  unless explicitly configured otherwise.</p>
+  views. Other external sessions, including PuduNet on hbg1, remain
+  own-prefix-only exports unless explicitly configured otherwise.</p>
   <h2>Peering policy</h2>
   <p>Manual peering requests are open. WireGuard is the preferred
   tunnel transport. MP-BGP over IPv6 link-local with Extended Next
@@ -286,13 +296,14 @@
   hard requirement.</p>
   <p><strong>hbg1 peering:</strong> hbg1 is a residential FreeBSD
   POP on a 200 Mbps home connection. Peering there is intentionally
-  small and experimental: each external peer will be capped at
-  5 Mbps in each direction. hbg1 accepts IPv6-underlay peers only:
-  your WireGuard endpoint must be publicly reachable over IPv6.
-  This does not mean IPv6 routes only; the MP-BGP session can carry
-  both IPv4 and IPv6 DN42 NLRI. hbg1 does not offer general transit
-  by default, and the residential connection carries no SLA or uptime
-  promise.</p>
+  small and experimental: external peers are capped at 5 Mbps in
+  each direction. hbg1 can initiate WireGuard sessions outbound to a
+  peer's reachable endpoint, including over IPv4. The BGP session
+  itself uses IPv6 link-local addressing and can carry both IPv4 and
+  IPv6 DN42 NLRI. Because hbg1 is a residential POP, do not assume
+  that it is directly reachable for inbound WireGuard on every public
+  address family. hbg1 does not offer general transit by default, and
+  the residential connection carries no SLA or uptime promise.</p>
   <p>I generate a <strong>fresh WireGuard keypair per approved
   peer</strong>. There is intentionally no single public WireGuard
   key shown here. After I approve a request, I create the
@@ -302,8 +313,7 @@
   <ul>
     <li>which node you would like to peer with: Clanker (New York,
     NY), ScopeCreep (Phoenix, AZ), or hbg1 (Harrisburg, PA,
-    residential; IPv6 WireGuard endpoint required; 5 Mbps
-    per-direction peer cap)</li>
+    residential; 5 Mbps per-direction peer cap)</li>
     <li>your ASN and network name</li>
     <li>a contact method</li>
     <li>your public WireGuard endpoint</li>
