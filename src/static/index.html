@@ -15,13 +15,12 @@
   <header>
     <h1>AS4242420425</h1>
     <p class="lede">JoyfulReaper / kgivler on DN42 — multi-edge
-    hobby network with a residential FreeBSD POP</p>
+    hobby network with public VPS POPs and a residential FreeBSD POP</p>
   </header>
   <h2>About</h2>
   <p>
-    This is my little corner of DN42: routing experiments, weird services,
-    old protocols, and whatever else seems interesting enough to put on the
-    fake Internet.
+    This is my little corner of DN42 for networking experiments, weird
+    services, and whatever else I feel like running.
   </p>
 
   <p class="muted">
@@ -43,7 +42,7 @@
       <dd><code>fdf0:e12c:5528::/48</code></dd>
 
       <dt>Edges</dt>
-      <dd>New York · Phoenix · Harrisburg</dd>
+      <dd>New York · Phoenix · Harrisburg · Frankfurt</dd>
 
       <dt>Landing</dt>
       <dd><code>joyfulreaper.dn42</code></dd>
@@ -92,19 +91,21 @@
   <h2>Network details</h2>
 
   <p>
-    Clanker and ScopeCreep are the two public VPS edges. A third router,
-    <strong>hbg1</strong>, runs as a residential FreeBSD POP in Harrisburg,
-    PA. The three routers form an internal iBGP mesh over dedicated WireGuard
-    links.
+    Clanker and ScopeCreep are public VPS edges. <strong>hbg1</strong> runs
+    as a residential FreeBSD POP in Harrisburg, PA, and the original three
+    routers form an internal iBGP mesh over dedicated WireGuard links.
+    <strong>Wurstcase</strong> is a Frankfurt VPS POP connected to Clanker
+    over its own WireGuard/iBGP core link.
   </p>
 
   <p>
     Clanker provides controlled full-table IPv4 and IPv6 transit to Baragoon
     and RoutedBits. ScopeCreep provides the same experimental model to iEdon
-    and Kioubit. hbg1 also has an external eBGP session with PuduNet NY01,
-    using own-prefix-only export and a 5 Mbps cap in each direction.
-    Transit paths use dedicated alternate routing tables, policy routing,
-    and bounded interface rates.
+    and Kioubit. hbg1 has an external eBGP session with PuduNet NY01 using
+    own-prefix-only export and a 5 Mbps cap in each direction. Wurstcase
+    carries the Silverha DE1 session in Frankfurt using controlled
+    full-table transit. Transit paths use dedicated alternate routing tables,
+    policy routing, and bounded interface rates where required.
   </p>
 
   <p class="muted">
@@ -122,6 +123,11 @@
       <strong>Looking Glass</strong> — <a href=
       "https://lg.joyfulreaper.dn42/">lg.joyfulreaper.dn42</a>
       (<a href="https://lg.kgivler.com/">clearnet mirror</a>)
+    </li>
+    <li>
+      <strong>DN42 Atlas</strong> — <a href=
+      "https://dn42atlas.dn42/">dn42atlas.dn42</a>
+      (<a href="https://github.com/JoyfulReaper/DN42Atlas">source</a>)
     </li>
     <li>
       <strong>Personal site</strong> — <a href=
@@ -179,15 +185,15 @@
   not currently guarantee that every resource used by the page
   remains inside DN42.</p>
   <h2>Hosting</h2>
-  <p>The public VPS side of this DN42 network runs on
+  <p>Clanker and ScopeCreep run on
   <a href="https://greencloudvps.com/billing/aff.php?aff=10295"
      target="_blank"
-     rel="sponsored noopener noreferrer">GreenCloud VPS</a>.
-  I use them for Clanker and ScopeCreep, which host routing, public
-  services, monitoring, and some of the other nonsense linked from
-  this site. They've worked well for the kind of small Linux VPS
-  infrastructure I run here, and the pricing has made it practical
-  to keep multiple locations online without spending much.</p>
+     rel="sponsored noopener noreferrer">GreenCloud VPS</a>, where they host
+  routing, public services, monitoring, and some of the other nonsense linked
+  from this site. Wurstcase is hosted separately by Servitro in Frankfurt,
+  Germany. GreenCloud has worked well for the kind of small Linux VPS
+  infrastructure I run here, and the pricing has made it practical to keep
+  multiple locations online without spending much.</p>
 
   <p class="muted">The GreenCloud link above is an affiliate link.
   I may earn a commission if you sign up through it.</p>
@@ -203,8 +209,11 @@
     identities internally.</li>
     <li><strong>hbg1 ↔ ScopeCreep</strong> — direct WireGuard core
     over native residential IPv6 with IPv6 MP-BGP/RFC 8950. This
-    completes the three-router full mesh and gives hbg1 an alternate
+    completes the original three-router full mesh and gives hbg1 an alternate
     internal route feed when its Clanker session is unavailable.</li>
+    <li><strong>Clanker ↔ Wurstcase</strong> — dedicated WireGuard core
+    with iBGP over IPv6 MP-BGP/RFC 8950. Wurstcase is the Frankfurt POP
+    and carries the Silverha external session.</li>
   </ul>
   <h2>Current peers</h2>
   <table>
@@ -276,6 +285,14 @@
         <td>Valid routes in; own prefixes out; no transit; 5 Mbps cap</td>
         <td class="status-up">Established</td>
       </tr>
+      <tr>
+        <td>Silverha</td>
+        <td><code>AS4242420762</code></td>
+        <td>Frankfurt, Germany</td>
+        <td>Wurstcase</td>
+        <td>Full table / controlled transit; 50 Mbps cap</td>
+        <td class="status-up">Established</td>
+      </tr>
     </tbody>
   </table>
   <p class="muted">For controlled-transit peers, third-party routes
@@ -285,8 +302,9 @@
   <code>secondary on</code> provide alternate export paths where
   available. ScopeCreep may forward transit through iEdon, Kioubit,
   MOE233, or the Clanker core according to its alternate routing
-  views. Other external sessions, including PuduNet on hbg1, remain
-  own-prefix-only exports unless explicitly configured otherwise.</p>
+  views. Wurstcase provides another controlled-transit edge through
+  Silverha in Frankfurt. Other external sessions, including PuduNet on hbg1,
+  remain own-prefix-only exports unless explicitly configured otherwise.</p>
   <h2>Peering policy</h2>
   <p>Manual peering requests are open. WireGuard is the preferred
   tunnel transport. MP-BGP over IPv6 link-local with Extended Next
@@ -312,8 +330,9 @@
   <h3>What to send</h3>
   <ul>
     <li>which node you would like to peer with: Clanker (New York,
-    NY), ScopeCreep (Phoenix, AZ), or hbg1 (Harrisburg, PA,
-    residential; 5 Mbps per-direction peer cap)</li>
+    NY), ScopeCreep (Phoenix, AZ), hbg1 (Harrisburg, PA,
+    residential; 5 Mbps per-direction peer cap), or Wurstcase
+    (Frankfurt, Germany)</li>
     <li>your ASN and network name</li>
     <li>a contact method</li>
     <li>your public WireGuard endpoint</li>
@@ -356,7 +375,7 @@
     "{{.Form.LinkLocalPreference}}"> <label for=
     "notes">Notes</label> 
     <textarea id="notes" name="notes" placeholder=
-    "Preferred edge (Clanker/New York, ScopeCreep/Phoenix, or hbg1/Harrisburg residential), BGP capabilities, routing policy, weirdness, etc.">
+    "Preferred edge (Clanker/New York, ScopeCreep/Phoenix, hbg1/Harrisburg residential, or Wurstcase/Frankfurt), BGP capabilities, routing policy, weirdness, etc.">
 
     {{.Form.Notes}}</textarea>
     <div class="honeypot" aria-hidden="true">
@@ -371,10 +390,11 @@
   third-party analytics or advertising services.</p>
   <footer>
     AS4242420425 · DN42 · probably overengineered for a hobby
-    network · Hosted on
+    network · VPS POPs on
     <a href="https://greencloudvps.com/billing/aff.php?aff=10295"
        target="_blank"
        rel="sponsored noopener noreferrer">GreenCloud VPS</a>
+    and Servitro
   </footer>
   <script src="/toys.js"></script>
 </body>
