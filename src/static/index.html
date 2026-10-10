@@ -48,7 +48,7 @@
       <dd><code>joyfulreaper.dn42</code></dd>
 
       <dt>Routing</dt>
-      <dd>BIRD 2 · internal iBGP core</dd>
+      <dd>BIRD 2 · 4-router full-mesh iBGP core</dd>
 
       <dt>Peering</dt>
       <dd>Open · manual approval · WireGuard</dd>
@@ -92,10 +92,10 @@
 
   <p>
     Clanker and ScopeCreep are public VPS edges. <strong>hbg1</strong> runs
-    as a residential FreeBSD POP in Harrisburg, PA, and the original three
-    routers form an internal iBGP mesh over dedicated WireGuard links.
-    <strong>Wurstcase</strong> is a Frankfurt VPS POP connected to Clanker
-    over its own WireGuard/iBGP core link.
+    as a residential FreeBSD POP in Harrisburg, PA, and
+    <strong>Wurstcase</strong> is a Frankfurt VPS POP. All four routers now
+    form a full internal iBGP mesh over dedicated WireGuard links, with a
+    direct core session between every pair of routers.
   </p>
 
   <p>
@@ -211,13 +211,20 @@
     Clanker and currently originates only its own router host
     identities internally.</li>
     <li><strong>hbg1 ↔ ScopeCreep</strong> — direct WireGuard core
-    over native residential IPv6 with IPv6 MP-BGP/RFC 8950. This
-    completes the original three-router full mesh and gives hbg1 an alternate
-    internal route feed when its Clanker session is unavailable.</li>
+    over native residential IPv6 with IPv6 MP-BGP/RFC 8950.</li>
     <li><strong>Clanker ↔ Wurstcase</strong> — dedicated WireGuard core
     with iBGP over IPv6 MP-BGP/RFC 8950. Wurstcase is the Frankfurt POP
     and carries the Silverha external session.</li>
+    <li><strong>ScopeCreep ↔ Wurstcase</strong> — direct WireGuard core
+    with IPv6 MP-BGP/RFC 8950, giving ScopeCreep a direct view of
+    Wurstcase/Silverha-learned paths.</li>
+    <li><strong>hbg1 ↔ Wurstcase</strong> — direct WireGuard core with
+    IPv6 MP-BGP/RFC 8950. This was the sixth link needed to complete the
+    four-router full mesh.</li>
   </ul>
+  <p class="muted">Four core routers require six direct iBGP relationships;
+  all six are active. hbg1's DN42 WireGuard tunnels are independently capped
+  at 5 Mbps in each direction per tunnel.</p>
   <h2>Current peers</h2>
   <table>
     <thead>
