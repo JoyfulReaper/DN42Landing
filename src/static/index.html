@@ -17,6 +17,17 @@
     <p class="lede">JoyfulReaper / kgivler on DN42 — multi-edge
     hobby network with public VPS POPs and a residential FreeBSD POP</p>
   </header>
+  <section class="card" aria-labelledby="wurstcase-incident">
+    <h2 class="warning" id="wurstcase-incident">Network notice —
+    Wurstcase (Frankfurt)</h2>
+    <p><strong>Degraded since October 19, 2026:</strong> Following an
+    upstream VPS host migration, Wurstcase has lost public IPv6
+    connectivity. IPv4 and its internal DN42 BGP core links remain
+    operational.</p>
+    <p class="muted">WireGuard peering requiring an IPv6 transport
+    endpoint is unavailable at Wurstcase, including the Silverha DE1
+    session. The issue has been reported to the upstream provider.</p>
+  </section>
   <h2>About</h2>
   <p>
     This is my little corner of DN42 for networking experiments, weird
@@ -103,8 +114,9 @@
     and RoutedBits. ScopeCreep provides the same experimental model to iEdon
     and Kioubit. hbg1 has an external eBGP session with PuduNet NY01 using
     own-prefix-only export and a 5 Mbps cap in each direction. Wurstcase
-    carries the Silverha DE1 session in Frankfurt using controlled
-    full-table transit. Transit paths use dedicated alternate routing tables,
+    normally carries the Silverha DE1 session in Frankfurt using controlled
+    full-table transit. That session is currently down due to the upstream
+    IPv6 outage. Transit paths use dedicated alternate routing tables,
     policy routing, and bounded interface rates where required.
   </p>
 
@@ -128,6 +140,11 @@
       <strong>DN42 Atlas</strong> — <a href=
       "https://dn42atlas.dn42/">dn42atlas.dn42</a>
       (<a href="https://github.com/JoyfulReaper/DN42Atlas">source</a>)
+    </li>
+    <li>
+      <strong>TCPNoise Observatory</strong> —
+      <a href="https://noise.joyfulreaper.dn42/">noise.joyfulreaper.dn42</a>
+      — sanitized live view of unsolicited traffic seen by public TCPNoise sensors.
     </li>
     <li>
       <strong>Personal site</strong> — <a href=
@@ -214,7 +231,7 @@
     over native residential IPv6 with IPv6 MP-BGP/RFC 8950.</li>
     <li><strong>Clanker ↔ Wurstcase</strong> — dedicated WireGuard core
     with iBGP over IPv6 MP-BGP/RFC 8950. Wurstcase is the Frankfurt POP
-    and carries the Silverha external session.</li>
+    and normally carries the Silverha external session.</li>
     <li><strong>ScopeCreep ↔ Wurstcase</strong> — direct WireGuard core
     with IPv6 MP-BGP/RFC 8950, giving ScopeCreep a direct view of
     Wurstcase/Silverha-learned paths.</li>
@@ -301,7 +318,7 @@
         <td>Frankfurt, Germany</td>
         <td>Wurstcase</td>
         <td>Full table / controlled transit; 50 Mbps cap</td>
-        <td class="status-up">Established</td>
+        <td class="warning">Down (upstream IPv6 outage)</td>
       </tr>
     </tbody>
   </table>
@@ -312,13 +329,17 @@
   <code>secondary on</code> provide alternate export paths where
   available. ScopeCreep may forward transit through iEdon, Kioubit,
   MOE233, or the Clanker core according to its alternate routing
-  views. Wurstcase provides another controlled-transit edge through
+  views. Wurstcase normally provides a controlled-transit edge through
   Silverha in Frankfurt. Other external sessions, including PuduNet on hbg1,
   remain own-prefix-only exports unless explicitly configured otherwise.</p>
   <h2>Peering policy</h2>
   <p>Manual peering requests are open. WireGuard is the preferred
   tunnel transport. MP-BGP over IPv6 link-local with Extended Next
   Hop is preferred where supported.</p>
+  <p class="warning"><strong>Wurstcase peering:</strong> IPv4-based
+  WireGuard peering remains available, but new tunnels requiring a public
+  IPv6 endpoint at Wurstcase may be delayed until the upstream outage is
+  resolved.</p>
   <p>Please have valid DN42 registry objects and ROAs. Low-latency
   North American peers are especially welcome, but they are not a
   hard requirement.</p>
