@@ -20,13 +20,14 @@
   <section class="card" aria-labelledby="wurstcase-incident">
     <h2 class="warning" id="wurstcase-incident">Network notice —
     Wurstcase (Frankfurt)</h2>
-    <p><strong>Degraded since October 19, 2026:</strong> Following an
-    upstream VPS host migration, Wurstcase has lost public IPv6
-    connectivity. IPv4 and its internal DN42 BGP core links remain
-    operational.</p>
-    <p class="muted">WireGuard peering requiring an IPv6 transport
-    endpoint is unavailable at Wurstcase, including the Silverha DE1
-    session. The issue has been reported to the upstream provider.</p>
+    <p><strong>OUTAGE — Wurstcase offline since approximately October 19, 2026.</strong>
+    The Frankfurt VPS is currently unreachable. Its internal DN42 BGP
+    sessions and external Silverha DE1 peering/transit are down.</p>
+    <p class="muted">This follows repeated problems with the upstream VPS
+    provider, including a recent host migration. Their handling of the
+    disruption and lack of timely support have been unacceptable.
+    There is no confirmed restoration time. Please use Clanker,
+    ScopeCreep, or hbg1 for new peering requests.</p>
   </section>
   <h2>About</h2>
   <p>
@@ -104,9 +105,10 @@
   <p>
     Clanker and ScopeCreep are public VPS edges. <strong>hbg1</strong> runs
     as a residential FreeBSD POP in Harrisburg, PA, and
-    <strong>Wurstcase</strong> is a Frankfurt VPS POP. All four routers now
-    form a full internal iBGP mesh over dedicated WireGuard links, with a
-    direct core session between every pair of routers.
+    <strong>Wurstcase</strong> is a Frankfurt VPS POP. The intended
+    topology is a four-router full-mesh iBGP core over dedicated
+    WireGuard links, but Wurstcase is currently offline and its
+    core sessions are down.
   </p>
 
   <p>
@@ -115,8 +117,8 @@
     and Kioubit. hbg1 has an external eBGP session with PuduNet NY01 using
     own-prefix-only export and a 5 Mbps cap in each direction. Wurstcase
     normally carries the Silverha DE1 session in Frankfurt using controlled
-    full-table transit. That session is currently down due to the upstream
-    IPv6 outage. Transit paths use dedicated alternate routing tables,
+    full-table transit. That session is currently down because Wurstcase
+    is offline. Transit paths use dedicated alternate routing tables,
     policy routing, and bounded interface rates where required.
   </p>
 
@@ -240,8 +242,8 @@
     four-router full mesh.</li>
   </ul>
   <p class="muted">Four core routers require six direct iBGP relationships;
-  all six are active. hbg1's DN42 WireGuard tunnels are independently capped
-  at 5 Mbps in each direction per tunnel.</p>
+  Wurstcase's core sessions are currently down. hbg1's DN42 WireGuard
+  tunnels are independently capped at 5 Mbps in each direction per tunnel.</p>
   <h2>Current peers</h2>
   <table>
     <thead>
@@ -318,7 +320,7 @@
         <td>Frankfurt, Germany</td>
         <td>Wurstcase</td>
         <td>Full table / controlled transit; 50 Mbps cap</td>
-        <td class="warning">Down (upstream IPv6 outage)</td>
+        <td class="warning">Down (Wurstcase offline)</td>
       </tr>
     </tbody>
   </table>
@@ -336,10 +338,10 @@
   <p>Manual peering requests are open. WireGuard is the preferred
   tunnel transport. MP-BGP over IPv6 link-local with Extended Next
   Hop is preferred where supported.</p>
-  <p class="warning"><strong>Wurstcase peering:</strong> IPv4-based
-  WireGuard peering remains available, but new tunnels requiring a public
-  IPv6 endpoint at Wurstcase may be delayed until the upstream outage is
-  resolved.</p>
+  <p class="warning"><strong>Wurstcase peering:</strong> This POP is
+  currently offline. New peering sessions cannot be activated there
+  until the provider restores service. Please request Clanker,
+  ScopeCreep, or hbg1 instead.</p>
   <p>Please have valid DN42 registry objects and ROAs. Low-latency
   North American peers are especially welcome, but they are not a
   hard requirement.</p>
@@ -363,7 +365,7 @@
     <li>which node you would like to peer with: Clanker (New York,
     NY), ScopeCreep (Phoenix, AZ), hbg1 (Harrisburg, PA,
     residential; 5 Mbps per-direction peer cap), or Wurstcase
-    (Frankfurt, Germany)</li>
+    (Frankfurt, Germany; currently offline)</li>
     <li>your ASN and network name</li>
     <li>a contact method</li>
     <li>your public WireGuard endpoint</li>
