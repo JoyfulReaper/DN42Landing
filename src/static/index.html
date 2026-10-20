@@ -26,8 +26,8 @@
     remaining issue is native public IPv6 connectivity. This does not
     mean DN42 IPv6 routes carried over the tunnels are down.</p>
     <p class="muted">Wurstcase can be considered for IPv4-underlay
-    peering requests. The external Silverha DE1 BGP/transit status
-    still needs verification following the recovery.</p>
+    peering requests. The external Silverha DE1 BGP session is
+    established again.</p>
   </section>
   <h2>About</h2>
   <p>
@@ -117,8 +117,8 @@
     and Kioubit. hbg1 has an external eBGP session with PuduNet NY01 using
     own-prefix-only export and a 5 Mbps cap in each direction. Wurstcase
     is configured for the Silverha DE1 session in Frankfurt using controlled
-    full-table transit. The external session's current state still needs
-    verification after Wurstcase's recovery. Transit paths use dedicated
+    full-table transit. The Silverha DE1 BGP session is established
+    again following Wurstcase's recovery. Transit paths use dedicated
     alternate routing tables, policy routing, and bounded interface
     rates where required.
   </p>
@@ -322,7 +322,7 @@
         <td>Frankfurt, Germany</td>
         <td>Wurstcase</td>
         <td>Full table / controlled transit; 50 Mbps cap</td>
-        <td class="warning">Pending verification after recovery</td>
+        <td class="status-up">Established</td>
       </tr>
     </tbody>
   </table>
