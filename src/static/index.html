@@ -58,6 +58,36 @@
     </dl>
   </section>
 
+  <section class="card network-card" aria-labelledby="topology-snapshot">
+    <h3 id="topology-snapshot">DN42 topology snapshot · October 23, 2026</h3>
+    <p>
+      A snapshot from map.dn42 shows <strong>9 distinct neighboring ASNs</strong>
+      and <strong>15 address-family neighbor entries</strong>
+      (8 IPv4 and 7 IPv6). Our four core routers form six direct
+      WireGuard/iBGP relationships.
+    </p>
+    <dl>
+      <dt>Map rank</dt>
+      <dd>#227</dd>
+      <dt>Map index</dt>
+      <dd>1956</dd>
+      <dt>Closeness</dt>
+      <dd>0.43360</dd>
+      <dt>Betweenness</dt>
+      <dd>0.00001</dd>
+    </dl>
+    <p class="muted">
+      Observed external ASNs: RoutedBits, MOE233, MDR, Silverha,
+      HEADSCARF175, Baragoon, iEdon, PuduMaster (PuduNet), and Kioubit.
+      These are public routing-graph observations, not a live BGP session
+      dashboard. Rank and centrality scores can change as the map updates.
+    </p>
+    <p class="muted">
+      <a href="http://explorer.burble.dn42/?#/4242420425">Explore
+      AS4242420425 in the DN42 Registry Explorer</a>.
+    </p>
+  </section>
+
   <h2>Live from the network</h2>
   <div class="grid toys-grid">
     <section class="card toy-card">
@@ -311,6 +341,15 @@
       </tr>
     </tbody>
   </table>
+  <p class="muted">
+    The table above describes eight documented external peering sessions.
+    The October 23 map.dn42 snapshot also identifies MDR
+    (<code>AS4242420401</code>) as a neighboring ASN. Its edge, session
+    state, and routing policy have not been independently verified here,
+    so it is not labeled Established in this operational table.
+    The map calls <code>AS4242422227</code> PuduMaster; that is the
+    PuduNet session listed above.
+  </p>
   <p class="muted">For controlled-transit peers, third-party routes
   learned from the ingress peer are excluded from that peer's return
   routing view, while directly originated prefixes remain reachable
