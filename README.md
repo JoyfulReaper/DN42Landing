@@ -33,14 +33,6 @@ The project is intentionally boring:
 - External BGP: MP-BGP over IPv6 link-local where supported
 - Route validation: DN42 ROA validation
 
-Map.dn42 snapshot (2026-10-23): 9 unique neighboring ASNs, 15
-address-family neighbor entries (8 IPv4 / 7 IPv6), rank #227, index 1956,
-closeness 0.43360, betweenness 0.00001. Observed: RoutedBits, MOE233,
-MDR, Silverha, HEADSCARF175, Baragoon, iEdon, PuduMaster/PuduNet,
-and Kioubit. These are graph observations, not independently verified
-current BGP session states. The operational page lists eight documented
-external peer sessions; MDR (AS4242420401) needs edge/policy verification.
-
 Shared web-service ingress:
 
 - IPv4: `172.20.220.50`
@@ -58,20 +50,24 @@ Current DN42 web services:
 Manual peering requests are open.
 
 AS4242420425 operates as a **multi-edge hobby network experimenting with
-controlled transit**. It accepts DN42 routes from external peers on both
-Clanker and ScopeCreep. Most external sessions remain own-prefix-only exports
+controlled transit**. It accepts DN42 routes from external peers across all four POPs. Most external sessions remain own-prefix-only exports
 unless explicitly configured otherwise.
 
 Clanker currently provides controlled full-table IPv4 and IPv6 transit to
-Baragoon (`AS4242421732`) and RoutedBits (`AS4242420207`). Each peer uses
-dedicated BIRD alternate routing tables together with a dedicated Linux policy
-routing table: `baragoon_transit4` / `baragoon_transit6` with table `1732`,
-and `routedbits_transit4` / `routedbits_transit6` with table `2207`. Traffic
-to AS4242420425's own prefixes bypasses the transit policy, while third-party
-routes learned from the ingress peer are excluded from that peer's return
-transit view to prevent hairpinning. Directly originated peer prefixes remain
-reachable over the direct session. Both peering interfaces are rate-limited
-to 50 Mbps in each direction.
+Baragoon (`AS4242421732`), RoutedBits (`AS4242420207`), and MDR/Mark
+(`AS4242420401`, useast01/New Jersey). All three BGP sessions use dedicated
+BIRD alternate routing tables and Linux policy routing:
+`baragoon_transit4/6` with table `1732`,
+`routedbits_transit4/6` with table `2207`, and
+`mdr_transit4/6` with table `2401`.
+
+Traffic to AS4242420425's own prefixes bypasses the transit policy, while
+third-party routes learned from an ingress peer are excluded from that peer's
+return transit view to prevent hairpinning. Directly originated peer prefixes
+remain reachable over their direct sessions. MDR transit exports also reject
+OTC, NO_EXPORT/NO_ADVERTISE, and paths containing MDR's ASN. The Baragoon and
+RoutedBits interfaces are rate-limited to 50 Mbps in each direction; an MDR
+bandwidth cap has not been documented.
 
 ScopeCreep also provides controlled full-table IPv4 and IPv6 transit to iEdon
 (`AS4242422189`) and Kioubit (`AS4242423914`), using dedicated per-peer
