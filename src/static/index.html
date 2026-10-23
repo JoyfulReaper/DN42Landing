@@ -58,36 +58,6 @@
     </dl>
   </section>
 
-  <section class="card network-card" aria-labelledby="topology-snapshot">
-    <h3 id="topology-snapshot">DN42 topology snapshot · October 23, 2026</h3>
-    <p>
-      A snapshot from map.dn42 shows <strong>9 distinct neighboring ASNs</strong>
-      and <strong>15 address-family neighbor entries</strong>
-      (8 IPv4 and 7 IPv6). Our four core routers form six direct
-      WireGuard/iBGP relationships.
-    </p>
-    <dl>
-      <dt>Map rank</dt>
-      <dd>#227</dd>
-      <dt>Map index</dt>
-      <dd>1956</dd>
-      <dt>Closeness</dt>
-      <dd>0.43360</dd>
-      <dt>Betweenness</dt>
-      <dd>0.00001</dd>
-    </dl>
-    <p class="muted">
-      Observed external ASNs: RoutedBits, MOE233, MDR, Silverha,
-      HEADSCARF175, Baragoon, iEdon, PuduMaster (PuduNet), and Kioubit.
-      These are public routing-graph observations, not a live BGP session
-      dashboard. Rank and centrality scores can change as the map updates.
-    </p>
-    <p class="muted">
-      <a href="http://explorer.burble.dn42/?#/4242420425">Explore
-      AS4242420425 in the DN42 Registry Explorer</a>.
-    </p>
-  </section>
-
   <h2>Live from the network</h2>
   <div class="grid toys-grid">
     <section class="card toy-card">
@@ -121,22 +91,20 @@
   <h2>Network details</h2>
 
   <p>
-    Clanker and ScopeCreep are public VPS edges. <strong>hbg1</strong> runs
+    Clanker, ScopeCreep, and Wurstcase are public VPS edges. <strong>hbg1</strong> runs
     as a residential FreeBSD POP in Harrisburg, PA, and
     <strong>Wurstcase</strong> is a Frankfurt VPS POP. The network uses
     a four-router full-mesh iBGP core over dedicated WireGuard links.
   </p>
 
   <p>
-    Clanker provides controlled full-table IPv4 and IPv6 transit to Baragoon
-    and RoutedBits. ScopeCreep provides the same experimental model to iEdon
-    and Kioubit. hbg1 has an external eBGP session with PuduNet NY01 using
-    own-prefix-only export and a 5 Mbps cap in each direction. Wurstcase
-    is configured for the Silverha DE1 session in Frankfurt using controlled
-    full-table transit. The Silverha DE1 BGP session is established
-    again following Wurstcase's recovery. Transit paths use dedicated
-    alternate routing tables, policy routing, and bounded interface
-    rates where required.
+    Clanker provides controlled full-table IPv4 and IPv6 transit to Baragoon,
+    RoutedBits, and MDR. ScopeCreep provides the same experimental model to
+    iEdon and Kioubit. hbg1 has an external eBGP session with PuduNet NY01
+    using own-prefix-only export and a 5 Mbps cap in each direction. Wurstcase
+    peers with Silverha DE1 in Frankfurt using controlled full-table transit.
+    Transit paths use dedicated alternate routing tables and policy routing,
+    with interface rate limits where configured.
   </p>
 
   <p class="muted">
@@ -291,6 +259,14 @@
         <td class="status-up">Established</td>
       </tr>
       <tr>
+        <td>MDR (Mark)</td>
+        <td><code>AS4242420401</code></td>
+        <td>New Jersey (useast01)</td>
+        <td>Clanker</td>
+        <td>Full table / controlled transit</td>
+        <td class="status-up">Established</td>
+      </tr>
+      <tr>
         <td>HEADSCARF175</td>
         <td><code>AS4242420842</code></td>
         <td>Piscataway, NJ</td>
@@ -341,15 +317,6 @@
       </tr>
     </tbody>
   </table>
-  <p class="muted">
-    The table above describes eight documented external peering sessions.
-    The October 23 map.dn42 snapshot also identifies MDR
-    (<code>AS4242420401</code>) as a neighboring ASN. Its edge, session
-    state, and routing policy have not been independently verified here,
-    so it is not labeled Established in this operational table.
-    The map calls <code>AS4242422227</code> PuduMaster; that is the
-    PuduNet session listed above.
-  </p>
   <p class="muted">For controlled-transit peers, third-party routes
   learned from the ingress peer are excluded from that peer's return
   routing view, while directly originated prefixes remain reachable
