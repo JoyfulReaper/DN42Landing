@@ -55,7 +55,7 @@ all four POPs. Most external sessions remain own-prefix-only exports unless
 explicitly configured otherwise.
 
 Clanker currently provides controlled full-table IPv4 and IPv6 transit to
-Baragoon (`AS4242421732`), RoutedBits (`AS4242420207`), and MDR/Mark
+Baragoon (`AS4242421732`), RoutedBits (`AS4242420207`), and MDR
 (`AS4242420401`, useast01/New Jersey). All three BGP sessions use dedicated
 BIRD alternate routing tables and Linux policy routing:
 `baragoon_transit4/6` with table `1732`,
