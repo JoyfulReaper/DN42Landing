@@ -17,7 +17,7 @@ The project is intentionally boring:
 - ASN: `AS4242420425`
 - IPv4 prefix: `172.20.220.48/28`
 - IPv6 prefix: `fdf0:e12c:5528::/48`
-- Public peering edges: Clanker and ScopeCreep
+- Public VPS peering edges: Clanker, ScopeCreep, and Wurstcase (Frankfurt, Germany)
 - Residential POP: hbg1 (FreeBSD 15.1, Harrisburg, PA)
 - Routing daemon: BIRD 2
 - Internal routing:
@@ -25,10 +25,21 @@ The project is intentionally boring:
   - Clanker ↔ hbg1: WireGuard over native IPv6 with one IPv6 MP-BGP session
   - hbg1 ↔ ScopeCreep: WireGuard over native IPv6 with one IPv6 MP-BGP session
   - IPv4 NLRI on both hbg1 core sessions uses RFC 8950 Extended Next Hop
-  - Clanker, ScopeCreep, and hbg1 form a full three-router iBGP mesh
+  - Clanker ↔ Wurstcase: WireGuard core with IPv6 MP-BGP/RFC 8950
+  - ScopeCreep ↔ Wurstcase: WireGuard core with IPv6 MP-BGP/RFC 8950
+  - hbg1 ↔ Wurstcase: WireGuard core with IPv6 MP-BGP/RFC 8950
+  - Clanker, ScopeCreep, hbg1, and Wurstcase form a full four-router iBGP mesh (six links)
 - Peering transport: WireGuard
 - External BGP: MP-BGP over IPv6 link-local where supported
 - Route validation: DN42 ROA validation
+
+Map.dn42 snapshot (2026-10-23): 9 unique neighboring ASNs, 15
+address-family neighbor entries (8 IPv4 / 7 IPv6), rank #227, index 1956,
+closeness 0.43360, betweenness 0.00001. Observed: RoutedBits, MOE233,
+MDR, Silverha, HEADSCARF175, Baragoon, iEdon, PuduMaster/PuduNet,
+and Kioubit. These are graph observations, not independently verified
+current BGP session states. The operational page lists eight documented
+external peer sessions; MDR (AS4242420401) needs edge/policy verification.
 
 Shared web-service ingress:
 
@@ -63,9 +74,14 @@ reachable over the direct session. Both peering interfaces are rate-limited
 to 50 Mbps in each direction.
 
 ScopeCreep also provides controlled full-table IPv4 and IPv6 transit to iEdon
-(`AS4242422189`) using a dedicated alternate-route policy view with equivalent
-anti-hairpin behavior. That peering interface is also limited to 50 Mbps in
-both directions.
+(`AS4242422189`) and Kioubit (`AS4242423914`), using dedicated per-peer
+alternate-route policy views with equivalent anti-hairpin behavior. Those
+peering interfaces are limited to 50 Mbps in both directions.
+
+Wurstcase is the Frankfurt VPS POP, with an established Silverha DE1
+(`AS4242420762`) session using controlled full-table transit. hbg1's
+PuduNet NY01 (`AS4242422227`) session exports only our own prefixes
+and is capped at 5 Mbps per direction; it does not offer general transit.
 
 Transit is experimental. This is a hobby network; no SLA or uptime guarantee
 is provided.
@@ -77,15 +93,14 @@ identities are `172.20.220.53/32` and `fdf0:e12c:5528::53/128`.
 
 Its internal core links to both Clanker and ScopeCreep run WireGuard over
 native residential IPv6. Each uses an IPv6 MP-BGP session carrying both IPv4
-and IPv6 routes; IPv4 uses RFC 8950 Extended Next Hop. Together, Clanker,
-ScopeCreep, and hbg1 form a full three-router iBGP mesh. Failover has been
-tested by taking the hbg1-to-Clanker BGP session down and confirming hbg1
-retained its DN42 routes through ScopeCreep.
+and IPv6 routes; IPv4 uses RFC 8950 Extended Next Hop. Together with Wurstcase, the four routers form a full six-link iBGP mesh.
+Failover has been tested by taking the hbg1-to-Clanker BGP session down and
+confirming hbg1 retained its DN42 routes through ScopeCreep.
 
-Manual external peering requests are accepted for hbg1, but the external
-WireGuard underlay is IPv6-only: peers must provide a publicly reachable IPv6
-WireGuard endpoint. This is only an underlay requirement; the MP-BGP session can
-still carry both IPv4 and IPv6 DN42 NLRI.
+Manual external peering requests are accepted for hbg1. hbg1 can initiate
+WireGuard toward an approved peer's reachable IPv4 or IPv6 endpoint; unsolicited
+inbound reachability on its residential underlay should not be assumed.
+Within the tunnel, IPv6 link-local MP-BGP carries both IPv4 and IPv6 DN42 NLRI.
 
 Because hbg1 sits on a 200 Mbps residential connection, each external peer will
 be capped at 5 Mbps in each direction. hbg1 peering is best-effort/experimental
