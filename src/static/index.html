@@ -17,18 +17,6 @@
     <p class="lede">JoyfulReaper / kgivler on DN42 — multi-edge
     hobby network with public VPS POPs and a residential FreeBSD POP</p>
   </header>
-  <section class="card" aria-labelledby="wurstcase-incident">
-    <h2 class="warning" id="wurstcase-incident">Network notice —
-    Wurstcase (Frankfurt)</h2>
-    <p><strong>DEGRADED — Wurstcase is back online, but native public IPv6 is unavailable.</strong>
-    The Frankfurt VPS has recovered from its October 19, 2026 outage.
-    Internal WireGuard and DN42 BGP core sessions have recovered; the
-    remaining issue is native public IPv6 connectivity. This does not
-    mean DN42 IPv6 routes carried over the tunnels are down.</p>
-    <p class="muted">Wurstcase can be considered for IPv4-underlay
-    peering requests. The external Silverha DE1 BGP session is
-    established again.</p>
-  </section>
   <h2>About</h2>
   <p>
     This is my little corner of DN42 for networking experiments, weird
@@ -107,8 +95,6 @@
     as a residential FreeBSD POP in Harrisburg, PA, and
     <strong>Wurstcase</strong> is a Frankfurt VPS POP. The network uses
     a four-router full-mesh iBGP core over dedicated WireGuard links.
-    Wurstcase's internal sessions have recovered, but its native
-    public IPv6 connectivity remains unavailable.
   </p>
 
   <p>
@@ -242,10 +228,9 @@
     IPv6 MP-BGP/RFC 8950. This was the sixth link needed to complete the
     four-router full mesh.</li>
   </ul>
-  <p class="muted">Four core routers require six direct iBGP relationships;
-  Wurstcase's core sessions have recovered, though its native public IPv6
-  remains unavailable. hbg1's DN42 WireGuard tunnels are independently
-  capped at 5 Mbps in each direction per tunnel.</p>
+  <p class="muted">Four core routers require six direct iBGP relationships.
+  hbg1's DN42 WireGuard tunnels are independently capped at 5 Mbps
+  in each direction per tunnel.</p>
   <h2>Current peers</h2>
   <table>
     <thead>
@@ -340,10 +325,6 @@
   <p>Manual peering requests are open. WireGuard is the preferred
   tunnel transport. MP-BGP over IPv6 link-local with Extended Next
   Hop is preferred where supported.</p>
-  <p class="warning"><strong>Wurstcase peering:</strong> The POP is online
-  but degraded because native public IPv6 is unavailable. IPv4-underlay
-  WireGuard peering requests can be submitted; activation is subject to
-  verification. Clanker, ScopeCreep, and hbg1 remain alternatives.</p>
   <p>Please have valid DN42 registry objects and ROAs. Low-latency
   North American peers are especially welcome, but they are not a
   hard requirement.</p>
@@ -367,7 +348,7 @@
     <li>which node you would like to peer with: Clanker (New York,
     NY), ScopeCreep (Phoenix, AZ), hbg1 (Harrisburg, PA,
     residential; 5 Mbps per-direction peer cap), or Wurstcase
-    (Frankfurt, Germany; degraded, no native public IPv6)</li>
+    (Frankfurt, Germany)</li>
     <li>your ASN and network name</li>
     <li>a contact method</li>
     <li>your public WireGuard endpoint</li>
