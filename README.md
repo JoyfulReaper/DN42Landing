@@ -17,7 +17,7 @@ The project is intentionally boring:
 - ASN: `AS4242420425`
 - IPv4 prefix: `172.20.220.48/28`
 - IPv6 prefix: `fdf0:e12c:5528::/48`
-- Public peering edges: Clanker and ScopeCreep
+- Public VPS peering edges: Clanker, ScopeCreep, and Wurstcase (Frankfurt, Germany)
 - Residential POP: hbg1 (FreeBSD 15.1, Harrisburg, PA)
 - Routing daemon: BIRD 2
 - Internal routing:
@@ -25,7 +25,10 @@ The project is intentionally boring:
   - Clanker ↔ hbg1: WireGuard over native IPv6 with one IPv6 MP-BGP session
   - hbg1 ↔ ScopeCreep: WireGuard over native IPv6 with one IPv6 MP-BGP session
   - IPv4 NLRI on both hbg1 core sessions uses RFC 8950 Extended Next Hop
-  - Clanker, ScopeCreep, and hbg1 form a full three-router iBGP mesh
+  - Clanker ↔ Wurstcase: WireGuard core with IPv6 MP-BGP/RFC 8950
+  - ScopeCreep ↔ Wurstcase: WireGuard core with IPv6 MP-BGP/RFC 8950
+  - hbg1 ↔ Wurstcase: WireGuard core with IPv6 MP-BGP/RFC 8950
+  - Clanker, ScopeCreep, hbg1, and Wurstcase form a full four-router iBGP mesh (six links)
 - Peering transport: WireGuard
 - External BGP: MP-BGP over IPv6 link-local where supported
 - Route validation: DN42 ROA validation
@@ -47,25 +50,35 @@ Current DN42 web services:
 Manual peering requests are open.
 
 AS4242420425 operates as a **multi-edge hobby network experimenting with
-controlled transit**. It accepts DN42 routes from external peers on both
-Clanker and ScopeCreep. Most external sessions remain own-prefix-only exports
-unless explicitly configured otherwise.
+controlled transit**. It accepts DN42 routes from external peers across
+all four POPs. Most external sessions remain own-prefix-only exports unless
+explicitly configured otherwise.
 
 Clanker currently provides controlled full-table IPv4 and IPv6 transit to
-Baragoon (`AS4242421732`) and RoutedBits (`AS4242420207`). Each peer uses
-dedicated BIRD alternate routing tables together with a dedicated Linux policy
-routing table: `baragoon_transit4` / `baragoon_transit6` with table `1732`,
-and `routedbits_transit4` / `routedbits_transit6` with table `2207`. Traffic
-to AS4242420425's own prefixes bypasses the transit policy, while third-party
-routes learned from the ingress peer are excluded from that peer's return
-transit view to prevent hairpinning. Directly originated peer prefixes remain
-reachable over the direct session. Both peering interfaces are rate-limited
-to 50 Mbps in each direction.
+Baragoon (`AS4242421732`), RoutedBits (`AS4242420207`), and MDR
+(`AS4242420401`, useast01/New Jersey). All three BGP sessions use dedicated
+BIRD alternate routing tables and Linux policy routing:
+`baragoon_transit4/6` with table `1732`,
+`routedbits_transit4/6` with table `2207`, and
+`mdr_transit4/6` with table `2401`.
+
+Traffic to AS4242420425's own prefixes bypasses the transit policy, while
+third-party routes learned from an ingress peer are excluded from that peer's
+return transit view to prevent hairpinning. Directly originated peer prefixes
+remain reachable over their direct sessions. MDR transit exports also reject
+OTC, NO_EXPORT/NO_ADVERTISE, and paths containing MDR's ASN. The Baragoon and
+RoutedBits interfaces are rate-limited to 50 Mbps in each direction; an MDR
+bandwidth cap has not been documented.
 
 ScopeCreep also provides controlled full-table IPv4 and IPv6 transit to iEdon
-(`AS4242422189`) using a dedicated alternate-route policy view with equivalent
-anti-hairpin behavior. That peering interface is also limited to 50 Mbps in
-both directions.
+(`AS4242422189`) and Kioubit (`AS4242423914`), using dedicated per-peer
+alternate-route policy views with equivalent anti-hairpin behavior. Those
+peering interfaces are limited to 50 Mbps in both directions.
+
+Wurstcase is the Frankfurt VPS POP, with an established Silverha DE1
+(`AS4242420762`) session using controlled full-table transit. hbg1's
+PuduNet NY01 (`AS4242422227`) session exports only our own prefixes
+and is capped at 5 Mbps per direction; it does not offer general transit.
 
 Transit is experimental. This is a hobby network; no SLA or uptime guarantee
 is provided.
@@ -77,15 +90,15 @@ identities are `172.20.220.53/32` and `fdf0:e12c:5528::53/128`.
 
 Its internal core links to both Clanker and ScopeCreep run WireGuard over
 native residential IPv6. Each uses an IPv6 MP-BGP session carrying both IPv4
-and IPv6 routes; IPv4 uses RFC 8950 Extended Next Hop. Together, Clanker,
-ScopeCreep, and hbg1 form a full three-router iBGP mesh. Failover has been
-tested by taking the hbg1-to-Clanker BGP session down and confirming hbg1
-retained its DN42 routes through ScopeCreep.
+and IPv6 routes; IPv4 uses RFC 8950 Extended Next Hop. Together with Wurstcase,
+the four routers form a full six-link iBGP mesh. Failover has been tested by
+taking the hbg1-to-Clanker BGP session down and
+confirming hbg1 retained its DN42 routes through ScopeCreep.
 
-Manual external peering requests are accepted for hbg1, but the external
-WireGuard underlay is IPv6-only: peers must provide a publicly reachable IPv6
-WireGuard endpoint. This is only an underlay requirement; the MP-BGP session can
-still carry both IPv4 and IPv6 DN42 NLRI.
+Manual external peering requests are accepted for hbg1. hbg1 can initiate
+WireGuard toward an approved peer's reachable IPv4 or IPv6 endpoint; unsolicited
+inbound reachability on its residential underlay should not be assumed.
+Within the tunnel, IPv6 link-local MP-BGP carries both IPv4 and IPv6 DN42 NLRI.
 
 Because hbg1 sits on a 200 Mbps residential connection, each external peer will
 be capped at 5 Mbps in each direction. hbg1 peering is best-effort/experimental

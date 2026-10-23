@@ -91,22 +91,20 @@
   <h2>Network details</h2>
 
   <p>
-    Clanker and ScopeCreep are public VPS edges. <strong>hbg1</strong> runs
-    as a residential FreeBSD POP in Harrisburg, PA, and
-    <strong>Wurstcase</strong> is a Frankfurt VPS POP. The network uses
-    a four-router full-mesh iBGP core over dedicated WireGuard links.
+    Clanker, ScopeCreep, and Wurstcase are public VPS edges.
+    <strong>hbg1</strong> runs as a residential FreeBSD POP in Harrisburg,
+    PA. Wurstcase is the Frankfurt POP. The network uses a four-router
+    full-mesh iBGP core over dedicated WireGuard links.
   </p>
 
   <p>
-    Clanker provides controlled full-table IPv4 and IPv6 transit to Baragoon
-    and RoutedBits. ScopeCreep provides the same experimental model to iEdon
-    and Kioubit. hbg1 has an external eBGP session with PuduNet NY01 using
-    own-prefix-only export and a 5 Mbps cap in each direction. Wurstcase
-    is configured for the Silverha DE1 session in Frankfurt using controlled
-    full-table transit. The Silverha DE1 BGP session is established
-    again following Wurstcase's recovery. Transit paths use dedicated
-    alternate routing tables, policy routing, and bounded interface
-    rates where required.
+    Clanker provides controlled full-table IPv4 and IPv6 transit to Baragoon,
+    RoutedBits, and MDR. ScopeCreep provides the same experimental model to
+    iEdon and Kioubit. hbg1 has an external eBGP session with PuduNet NY01
+    using own-prefix-only export and a 5 Mbps cap in each direction. Wurstcase
+    peers with Silverha DE1 in Frankfurt using controlled full-table transit.
+    Transit paths use dedicated alternate routing tables and policy routing,
+    with interface rate limits where configured.
   </p>
 
   <p class="muted">
@@ -258,6 +256,14 @@
         <td>New York, NY</td>
         <td>Clanker</td>
         <td>Full table / controlled transit; 50 Mbps cap</td>
+        <td class="status-up">Established</td>
+      </tr>
+      <tr>
+        <td>MDR</td>
+        <td><code>AS4242420401</code></td>
+        <td>New Jersey (useast01)</td>
+        <td>Clanker</td>
+        <td>Full table / controlled transit</td>
         <td class="status-up">Established</td>
       </tr>
       <tr>
