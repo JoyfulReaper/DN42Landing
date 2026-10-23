@@ -50,8 +50,9 @@ Current DN42 web services:
 Manual peering requests are open.
 
 AS4242420425 operates as a **multi-edge hobby network experimenting with
-controlled transit**. It accepts DN42 routes from external peers across all four POPs. Most external sessions remain own-prefix-only exports
-unless explicitly configured otherwise.
+controlled transit**. It accepts DN42 routes from external peers across
+all four POPs. Most external sessions remain own-prefix-only exports unless
+explicitly configured otherwise.
 
 Clanker currently provides controlled full-table IPv4 and IPv6 transit to
 Baragoon (`AS4242421732`), RoutedBits (`AS4242420207`), and MDR/Mark
@@ -89,8 +90,9 @@ identities are `172.20.220.53/32` and `fdf0:e12c:5528::53/128`.
 
 Its internal core links to both Clanker and ScopeCreep run WireGuard over
 native residential IPv6. Each uses an IPv6 MP-BGP session carrying both IPv4
-and IPv6 routes; IPv4 uses RFC 8950 Extended Next Hop. Together with Wurstcase, the four routers form a full six-link iBGP mesh.
-Failover has been tested by taking the hbg1-to-Clanker BGP session down and
+and IPv6 routes; IPv4 uses RFC 8950 Extended Next Hop. Together with Wurstcase,
+the four routers form a full six-link iBGP mesh. Failover has been tested by
+taking the hbg1-to-Clanker BGP session down and
 confirming hbg1 retained its DN42 routes through ScopeCreep.
 
 Manual external peering requests are accepted for hbg1. hbg1 can initiate
