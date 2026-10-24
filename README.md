@@ -55,20 +55,30 @@ all four POPs. Most external sessions remain own-prefix-only exports unless
 explicitly configured otherwise.
 
 Clanker currently provides controlled full-table IPv4 and IPv6 transit to
-Baragoon (`AS4242421732`), RoutedBits (`AS4242420207`), and MDR
-(`AS4242420401`, useast01/New Jersey). All three BGP sessions use dedicated
-BIRD alternate routing tables and Linux policy routing:
-`baragoon_transit4/6` with table `1732`,
-`routedbits_transit4/6` with table `2207`, and
-`mdr_transit4/6` with table `2401`.
+Baragoon (`AS4242421732`), RoutedBits (`AS4242420207`), and Mark Round/MDR
+(`AS4242420401`, useast01/New Jersey). External peers use dedicated BIRD
+transit views, Linux kernel routing tables, and ingress policy routing:
 
-Traffic to AS4242420425's own prefixes bypasses the transit policy, while
-third-party routes learned from an ingress peer are excluded from that peer's
-return transit view to prevent hairpinning. Directly originated peer prefixes
-remain reachable over their direct sessions. MDR transit exports also reject
-OTC, NO_EXPORT/NO_ADVERTISE, and paths containing MDR's ASN. The Baragoon and
-RoutedBits interfaces are rate-limited to 50 Mbps in each direction; an MDR
-bandwidth cap has not been documented.
+| Clanker traffic arriving from | BIRD transit tables | Linux table | IPv4/IPv6 ingress policy |
+| --- | --- | ---: | --- |
+| Baragoon | `baragoon_transit4/6` | `1732` | Own-prefix exception, table lookup, prohibit at `21875` |
+| RoutedBits | `routedbits_transit4/6` | `2207` | Own-prefix exception, table lookup, prohibit at `21895` |
+| MDR / Mark Round | `mdr_transit4/6` | `2401` | Own-prefix exception, table lookup, prohibit at `21940` |
+| Wurstcase internal core | `wurstcase_transit4/6` | `4255` | Own-prefix exception, table lookup, prohibit at `21915` |
+
+Traffic to AS4242420425's own prefixes is excepted into the main table.
+Peer-specific pipe filters retain directly originated peer prefixes but
+exclude third-party routes whose selected path came through the ingress peer,
+reducing return-path hairpinning. A BIRD pipe copies selected master routes,
+not every alternate BGP candidate; dedicated tables can therefore lack
+reachable alternatives and should be tested explicitly. Policy lookups fail
+closed with terminal `prohibit` rules rather than falling through to a public
+Internet default route. Clanker's UFW transit permissions are limited to
+approved DN42 tunnel pairs.
+
+MDR's export policy rejects OTC, NO_EXPORT/NO_ADVERTISE, and AS paths
+containing MDR's ASN. The Baragoon and RoutedBits interfaces are rate-limited
+to 50 Mbps in each direction; an MDR bandwidth cap has not been documented.
 
 ScopeCreep also provides controlled full-table IPv4 and IPv6 transit to iEdon
 (`AS4242422189`) and Kioubit (`AS4242423914`), using dedicated per-peer
@@ -76,12 +86,33 @@ alternate-route policy views with equivalent anti-hairpin behavior. Those
 peering interfaces are limited to 50 Mbps in both directions.
 
 Wurstcase is the Frankfurt VPS POP, with an established Silverha DE1
-(`AS4242420762`) session using controlled full-table transit. hbg1's
+(`AS4242420762`) session using controlled full-table transit. Incoming
+Silverha traffic is routed using `silverha_transit4/6` and Linux table `2762`,
+with own-prefix exceptions and terminal `prohibit` rules at priority `22020`.
+UFW allows Silverha transit toward Clanker, ScopeCreep, and hbg1. hbg1's
 PuduNet NY01 (`AS4242422227`) session exports only our own prefixes
 and is capped at 5 Mbps per direction; it does not offer general transit.
 
 Transit is experimental. This is a hobby network; no SLA or uptime guarantee
 is provided.
+
+### Operator documentation
+
+- [New peer setup and validation runbook](docs/PEERING-RUNBOOK.md) — WireGuard,
+  BIRD, ROA checks, full transit, policy routing, UFW, rollback.
+- [Routing architecture and inventory](docs/ROUTING-ARCHITECTURE.md) — the
+  internal POP roles and per-ingress tables.
+- [Transit troubleshooting](docs/TRANSIT-TROUBLESHOOTING.md) — diagnostics,
+  recovery, and unverified persistence hazards.
+
+**Operational status (October 2026):** Mark and Silverha BGP sessions, local
+transit tables, policy lookups, UFW rules, and fail-closed lookups have been
+verified. This does **not** constitute an independent end-to-end forwarded
+packet test from the remote peers. Clanker's
+`ManageForeignRoutingPolicyRules=no` networkd drop-in was installed and
+verified on disk but was **not yet activated through a controlled networkd
+restart**. Its role in the earlier disappearance of policy rules is suspected,
+not proven. Other POP audits and persistence tests remain open.
 
 ### Residential POP / hbg1
 
