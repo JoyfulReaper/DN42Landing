@@ -55,20 +55,28 @@ all four POPs. Most external sessions remain own-prefix-only exports unless
 explicitly configured otherwise.
 
 Clanker currently provides controlled full-table IPv4 and IPv6 transit to
-Baragoon (`AS4242421732`), RoutedBits (`AS4242420207`), and MDR
-(`AS4242420401`, useast01/New Jersey). All three BGP sessions use dedicated
-BIRD alternate routing tables and Linux policy routing:
-`baragoon_transit4/6` with table `1732`,
-`routedbits_transit4/6` with table `2207`, and
-`mdr_transit4/6` with table `2401`.
+Baragoon (`AS4242421732`), RoutedBits (`AS4242420207`), and MDR/Mark Round
+(`AS4242420401`, useast01/New Jersey). These external sessions have dedicated
+BIRD alternate routing tables and ingress-specific Linux policy routing. An
+additional ingress-specific view handles traffic arriving from the Wurstcase
+iBGP core. The current Clanker assignments are:
 
-Traffic to AS4242420425's own prefixes bypasses the transit policy, while
-third-party routes learned from an ingress peer are excluded from that peer's
-return transit view to prevent hairpinning. Directly originated peer prefixes
-remain reachable over their direct sessions. MDR transit exports also reject
-OTC, NO_EXPORT/NO_ADVERTISE, and paths containing MDR's ASN. The Baragoon and
-RoutedBits interfaces are rate-limited to 50 Mbps in each direction; an MDR
-bandwidth cap has not been documented.
+| Ingress | BIRD tables | Linux table | Policy priorities (own / lookup / prohibit) |
+| --- | --- | ---: | --- |
+| Baragoon | `baragoon_transit4/6` | 1732 | `21860 / 21870 / 21875` |
+| RoutedBits | `routedbits_transit4/6` | 2207 | `21880 / 21890 / 21895` |
+| Wurstcase core | `wurstcase_transit4/6` | 4255 | `21900 / 21910 / 21915` |
+| MDR | `mdr_transit4/6` | 2401 | `21920 / 21930 / 21940` |
+
+Traffic to AS4242420425's own prefixes can use the main routing table, while
+the peer-specific views filter selected third-party routes learned from that
+ingress peer, retaining directly originated peer prefixes. Each policy has a
+terminal `prohibit` rule to stop unmatched ingress traffic falling back to a
+public Internet default route. These filters reduce hairpinning but do not
+guarantee a non-best alternate path is present for every DN42 destination.
+The MDR export filters also reject OTC, NO_EXPORT/NO_ADVERTISE and paths
+containing MDR's ASN. Baragoon and RoutedBits interfaces are rate-limited to
+50 Mbps in each direction; an MDR bandwidth cap has not been documented.
 
 ScopeCreep also provides controlled full-table IPv4 and IPv6 transit to iEdon
 (`AS4242422189`) and Kioubit (`AS4242423914`), using dedicated per-peer
@@ -76,12 +84,36 @@ alternate-route policy views with equivalent anti-hairpin behavior. Those
 peering interfaces are limited to 50 Mbps in both directions.
 
 Wurstcase is the Frankfurt VPS POP, with an established Silverha DE1
-(`AS4242420762`) session using controlled full-table transit. hbg1's
-PuduNet NY01 (`AS4242422227`) session exports only our own prefixes
+(`AS4242420762`) session using controlled full-table transit. Silverha ingress
+uses dedicated BIRD tables `silverha_transit4/6`, Linux routing table `2762`,
+and the `22000 / 22010 / 22020` IPv4/IPv6 policy-rule priorities (own,
+lookup, prohibit). The selected DN42 table routes and fail-closed lookups were
+verified locally, as were UFW forwarding pairs for Clanker, ScopeCreep and hbg1.
+hbg1's PuduNet NY01 (`AS4242422227`) session exports only our own prefixes
 and is capped at 5 Mbps per direction; it does not offer general transit.
 
 Transit is experimental. This is a hobby network; no SLA or uptime guarantee
 is provided.
+
+### Operator runbooks and outstanding validation
+
+- [Peering runbook](docs/PEERING-RUNBOOK.md) — adding an own-prefix-only or
+  full-transit peer, WireGuard/BIRD setup, ROA filters, ingress pipes, Linux
+  policy rules, UFW, tests and rollback.
+- [Transit troubleshooting](docs/TRANSIT-TROUBLESHOOTING.md) — missing rules,
+  BGP reconnections, fail-closed checks, forwarding hairpins and recovery.
+
+**Status as of 2026-10-24:** Mark and Silverha are configured for controlled
+full transit; BGP, dedicated Linux route tables, selected forwarding lookups,
+and fail-closed policy routing have been verified locally. **End-to-end
+forwarded-packet tests with the remote peers are still pending.** Clanker
+previously lost older `ip rule` entries while their systemd oneshot services
+continued reporting active. A `systemd-networkd` drop-in setting
+`ManageForeignRoutingPolicyRules=no` has been installed on Clanker but
+**has not yet been activated or validated via a controlled networkd restart**.
+Networkd cleanup is a plausible cause of the missing rules, not a confirmed
+root cause. Wurstcase did not have networkd active when checked. Further
+policy-rule persistence tests and remaining POP audits are pending.
 
 ### Residential POP / hbg1
 
