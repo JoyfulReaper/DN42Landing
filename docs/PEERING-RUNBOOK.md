@@ -32,11 +32,16 @@ systemctl is-active systemd-networkd
 
    ```sh
    sudo install -d -m 700 /etc/wireguard
-   sudo sh -c 'umask 077; wg genkey > /etc/wireguard/PEER.key'
-   sudo sh -c 'wg pubkey < /etc/wireguard/PEER.key > /etc/wireguard/PEER.pub'
+   sudo sh -c '
+     umask 077
+     test ! -e /etc/wireguard/PEER.key || exit 1
+     test ! -e /etc/wireguard/PEER.pub || exit 1
+     wg genkey > /etc/wireguard/PEER.key || exit 1
+     wg pubkey < /etc/wireguard/PEER.key > /etc/wireguard/PEER.pub
+   '
    ```
 
-   Replace `PEER` with a deliberate unique identifier and refuse to overwrite a pre-existing key; the commands above are **illustrative only**, not a safe overwrite-proof script. Exchange *only* the contents of the `.pub` file.
+   Replace `PEER` with a deliberate unique identifier. This refuses to overwrite existing keys. Check command exit status and protect the key directory during subsequent edits. Exchange *only* the contents of the `.pub` file.
 
 4. Configure `/etc/wireguard/<interface>.conf` with the root-only private key, local listen port, local tunnel address (commonly `fe80::.../64`), remote peer public key, endpoint and agreed `AllowedIPs`. For BGP-managed full DN42 routing, `Table = off` prevents wg-quick from injecting a default route into Linux's main table. Some existing DN42 tunnels use `AllowedIPs = 0.0.0.0/0, ::/0`; that is a WireGuard packet authorization/routing scope, **not** permission to send general clearnet traffic.
 5. Start the tunnel only after syntax/permissions review: `sudo systemctl enable --now wg-quick@<interface>`. Check `sudo wg show <interface>`, link-local reachability, a recent handshake and traffic in both directions. Review the corresponding inbound UDP firewall rule. A handshake alone does not establish BGP or transit forwarding.
