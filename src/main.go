@@ -36,6 +36,7 @@ const (
 	defaultRandomQOTDURL = "https://qotd.kgivler.dn42/api/quotes/random"
 	defaultGitURL        = "https://api.kgivler.dn42/api/github/activity?limit=4"
 	defaultStatusURL     = "https://api.kgivler.dn42/api/system/status"
+	defaultNoiseURL      = "https://noise.kgivler.com/api/snapshot"
 )
 
 var asnPattern = regexp.MustCompile(`(?i)^AS[0-9]{1,10}$`)
@@ -240,6 +241,15 @@ func main() {
 			r,
 			a.httpClient,
 			envOrDefault("DN42LANDING_STATUS_URL", defaultStatusURL),
+		)
+	})
+
+	mux.HandleFunc("GET /api/toys/noise", func(w http.ResponseWriter, r *http.Request) {
+		proxyJSON(
+			w,
+			r,
+			a.httpClient,
+			envOrDefault("DN42LANDING_NOISE_URL", defaultNoiseURL),
 		)
 	})
 
