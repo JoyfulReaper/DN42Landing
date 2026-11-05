@@ -69,12 +69,17 @@
     </section>
     <section class="card toy-card toy-wide">
       <div class="toy-heading">
-        <h2>TCPNoise Observatory</h2><span class=
-        "toy-service">COMING SOON</span>
+        <h2>Internet Weather</h2><button id="noise-refresh"
+        class="toy-button" type="button">Refresh</button>
       </div>
-      <p>See what strange things are poking at the network.</p>
-      <p class="status coming-soon">Sensor feed not yet
-      connected.</p>
+      <p>Today's forecast: unsolicited connections, with a chance
+      of botnets.</p>
+      <div id="noise-weather" class="toy-output" aria-live="polite">
+        <span class="muted">Checking conditions at TCPNoise Observatory...</span>
+      </div>
+      <p class="muted">
+        <a href="https://noise.joyfulreaper.dn42/">Explore TCPNoise Observatory</a>
+      </p>
     </section>
     <section class="card toy-card toy-wide">
       <div class="toy-heading">
