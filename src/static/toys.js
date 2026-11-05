@@ -285,6 +285,81 @@ async function loadWorkstation() {
   }
 }
 
+async function loadNoiseWeather() {
+  const container = document.getElementById("noise-weather");
+  const button = document.getElementById("noise-refresh");
+
+  if (!container) return;
+
+  if (button) button.disabled = true;
+
+  try {
+    const response = await fetch("/api/toys/noise", {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const snapshot = await response.json();
+    const fiveMinutes = snapshot.eventsLastFiveMinutes;
+    const oneHour = snapshot.eventsLastHour;
+
+    if (
+      typeof snapshot.levelDisplay !== "string" ||
+      !snapshot.levelDisplay.trim() ||
+      !Number.isSafeInteger(fiveMinutes) ||
+      fiveMinutes < 0 ||
+      !Number.isSafeInteger(oneHour) ||
+      oneHour < 0
+    ) {
+      throw new Error("Invalid Observatory snapshot");
+    }
+
+    const icons = {
+      quiet: "☀️",
+      drizzle: "🌦️",
+      rain: "🌧️",
+      heavy_rain: "⛈️",
+      botnet_thunderstorm: "🌩️",
+      botnet_hurricane: "🌀",
+    };
+
+    const icon = icons[snapshot.level] || "📡";
+    const rate = typeof snapshot.eventsPerMinute === "number" &&
+      Number.isFinite(snapshot.eventsPerMinute) &&
+      snapshot.eventsPerMinute >= 0
+      ? snapshot.eventsPerMinute
+      : fiveMinutes / 5;
+
+    const grid = document.createElement("dl");
+    grid.className = "status-grid";
+
+    for (const [label, value] of [
+      ["Last 5 minutes", fiveMinutes.toLocaleString()],
+      ["Last hour", oneHour.toLocaleString()],
+      ["Events/min", rate.toFixed(1)],
+    ]) {
+      grid.append(textElement("dt", label), textElement("dd", value));
+    }
+
+    container.replaceChildren(
+      textElement("div", `${icon} ${snapshot.levelDisplay}`, "toy-quote"),
+      grid,
+      textElement("div", "Sanitized public sensor activity · rolling windows", "toy-meta")
+    );
+  } catch (error) {
+    console.error("Internet weather:", error);
+
+    container.replaceChildren(
+      textElement("span", "Internet weather is temporarily unavailable.", "warning")
+    );
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
 async function loadWhoami() {
   const container = document.getElementById("whoami");
   if (!container) return;
@@ -337,6 +412,13 @@ document
     void loadRandomQuote();
   });
 
+document
+  .getElementById("noise-refresh")
+  ?.addEventListener("click", () => {
+    void loadNoiseWeather();
+  });
+
+void loadNoiseWeather();
 void loadWorkstation();
 void loadRandomQuote();
 void loadQotd();
