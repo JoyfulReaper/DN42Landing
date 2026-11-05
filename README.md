@@ -168,8 +168,17 @@ Environment variables:
 | `DN42LANDING_NTFY_URL` | `http://127.0.0.1:5197/dn42-peering` |
 | `DN42LANDING_NTFY_TOKEN` | empty |
 | `DN42LANDING_RATE_LIMIT` | `15m` |
+| `DN42LANDING_NOISE_URL` | `https://noise.kgivler.com/api/snapshot` |
 
 If `DN42LANDING_NTFY_URL` is empty, ntfy is disabled.
+
+The Network Toys **Internet Weather** card reads TCPNoise Observatory's sanitized
+public snapshot through `GET /api/toys/noise`. DN42Landing fetches it server-side
+so visitors do not need clearnet access or cross-origin browser permissions.
+`DN42LANDING_NOISE_URL` can point to a reachable DN42/internal Observatory URL
+instead; if using a DN42 HTTPS hostname, the host must trust its issuing CA.
+Only the existing public weather condition and aggregate counts are displayed.
+If Observatory is unavailable, the card shows a fallback message.
 
 ## First Clanker smoke test
 
